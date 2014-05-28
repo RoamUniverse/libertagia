@@ -22,8 +22,8 @@ public class UserInfo implements Serializable {
 	private transient Image captcha;
 	private transient HttpURLConnection conn = null;
 	private Map<String, String> cookies = new HashMap<String, String>();
-	private transient String status;
-
+	private transient String status = "初始化";
+	private int rowIndex;
 	/**
 	 * 构建请求头
 	 * 
@@ -53,10 +53,8 @@ public class UserInfo implements Serializable {
 	}
 
 	public UserInfo(String username, String password) {
-		super();
 		this.username = username;
 		this.password = password;
-		this.getLogin();
 	}
 
 	/**
@@ -210,6 +208,14 @@ public class UserInfo implements Serializable {
 
 	public String getStatus() {
 		return status;
+	}
+
+	public int getRowIndex() {
+		return rowIndex;
+	}
+
+	public void setRowIndex(int rowIndex) {
+		this.rowIndex = rowIndex;
 	}
 	
 
