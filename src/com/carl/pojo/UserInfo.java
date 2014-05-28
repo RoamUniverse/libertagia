@@ -19,10 +19,10 @@ import javax.imageio.ImageIO;
 public class UserInfo implements Serializable {
 	private String username;
 	private String password;
-	private Image captcha;
-	private HttpURLConnection conn = null;
+	private transient Image captcha;
+	private transient HttpURLConnection conn = null;
 	private Map<String, String> cookies = new HashMap<String, String>();
-	private String status;
+	private transient String status;
 
 	/**
 	 * 构建请求头

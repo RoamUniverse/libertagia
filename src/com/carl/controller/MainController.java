@@ -46,20 +46,25 @@ public class MainController {
 	}
 
 	/*
-	 * 回调页面,显示信息
-	 */
-	private void showMessage(String msg) {
-
-	}
-
-	
-	/*
 	 * 将UserInfo对象序列化至硬盘
 	 */
 	public void saveFileForCookies(String path) {
 
 	}
+	
+	/*
+	 * 回调页面,显示信息
+	 */
+	private void showMessage(String msg) {
 
+	}
+	
+	/*
+	 * 回调页面,显示日志
+	 */
+	private void showLogs(String log) {
+		
+	}
 	public List<UserInfo> getInfos() {
 		return infos;
 	}
