@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+
 public class UserInfo implements Serializable {
 	private String username;
 	private String password;
