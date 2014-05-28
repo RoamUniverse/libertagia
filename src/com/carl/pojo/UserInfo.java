@@ -1,4 +1,4 @@
-package com.carl.model;
+package com.carl.pojo;
 
 import java.awt.Image;
 import java.io.IOException;

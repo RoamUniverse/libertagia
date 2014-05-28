@@ -3,7 +3,7 @@ package com.carl.main;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.carl.model.UserInfo;
+import com.carl.pojo.UserInfo;
 import com.carl.window.MainWindow;
 
 public class Begin {

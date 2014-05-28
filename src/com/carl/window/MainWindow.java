@@ -26,7 +26,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.carl.model.UserInfo;
+import com.carl.pojo.UserInfo;
+
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.JDesktopPane;
