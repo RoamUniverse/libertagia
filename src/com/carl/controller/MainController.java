@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.carl.message.LogLevel;
 import com.carl.pojo.UserInfo;
+import com.carl.thread.RequestThread;
 import com.carl.window.MainWindow;
 
 /**
@@ -94,6 +95,27 @@ public class MainController {
 	 */
 	public void pushCaotcha(int index, String captcha) {
 		// TODO 启动线程 进行登陆cookie获取
+//		UserInfo u = infos.get(index);
+		
+	}
+	
+	public void nextAccount() {
+		for (UserInfo u : infos) {
+			if("未操作".equals(u.getStatus())){
+				window.setCaptchaAndAccount(u);
+				return;
+			}
+		}
+		this.showLogs(LogLevel.LOG_INFO, "无账户需要初始化.");
+	}
+	
+	/*
+	 * 初始化所有账户数据
+	 */
+	public void initAllAccount() {
+		for (UserInfo u : infos) {
+			new RequestThread(this,u).start();
+		}
 	}
 
 	/*
@@ -106,7 +128,7 @@ public class MainController {
 	/*
 	 * 回调页面,显示信息
 	 */
-	private void showMessage(String msg) {
+	public void showMessage(String msg) {
 		this.showLogs(LogLevel.LOG_ERROR, msg);
 		this.window.showMessage(msg);
 	}
@@ -114,10 +136,16 @@ public class MainController {
 	/*
 	 * 回调页面,显示日志
 	 */
-	private void showLogs(String level, String log) {
+	public void showLogs(String level, String log) {
 		this.window.showLogs(level + log + lineSeparator);
 	}
 
+	/*
+	 * 更新表格数据
+	 */
+	public void updateTable(UserInfo userInfo) {
+		
+	}
 	public List<UserInfo> getInfos() {
 		return infos;
 	}

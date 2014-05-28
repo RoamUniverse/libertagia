@@ -42,7 +42,7 @@ public class MainWindow extends JFrame {
 	// 验证码输入框
 	private JTextField captchaText;
 	// 刷新按钮
-	private JButton refreshBtn;
+	private JButton initBtn;
 	// 载入按钮
 	private JButton btnLoadAccount;
 	// 控制器
@@ -51,6 +51,8 @@ public class MainWindow extends JFrame {
 	private JTextArea logTextArea;
 	// 表模型
 	private DefaultTableModel model;
+	// 用户名标签
+	private JLabel accountLabel;
 
 	/**
 	 * Launch the application.
@@ -90,11 +92,11 @@ public class MainWindow extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		refreshBtn = new JButton("Refresh");
-		refreshBtn.setBackground(Color.WHITE);
-		refreshBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		refreshBtn.setBounds(484, 25, 117, 36);
-		contentPane.add(refreshBtn);
+		initBtn = new JButton("\u521D\u59CB\u5316");
+		initBtn.setBackground(Color.WHITE);
+		initBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		initBtn.setBounds(484, 25, 117, 36);
+		contentPane.add(initBtn);
 
 		String[] name = { "username", "status" };
 		model = new DefaultTableModel(null, name);
@@ -106,7 +108,7 @@ public class MainWindow extends JFrame {
 		scrollPane.setBounds(10, 11, 429, 381);
 		contentPane.add(scrollPane);
 		captcha = new JLabel();
-		captcha.setBounds(484, 147, 117, 36);
+		captcha.setBounds(484, 147, 120, 43);
 		captcha.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		contentPane.add(captcha);
 		captchaText = new JTextField(20);
@@ -125,7 +127,7 @@ public class MainWindow extends JFrame {
 		nextBtn.setBounds(484, 242, 117, 36);
 		contentPane.add(nextBtn);
 
-		JLabel accountLabel = new JLabel("");
+		accountLabel = new JLabel("");
 		accountLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
 		accountLabel.setBounds(484, 110, 117, 26);
 		accountLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -173,14 +175,17 @@ public class MainWindow extends JFrame {
 		// next按钮事件
 		nextBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Next", "title",
-						JOptionPane.PLAIN_MESSAGE);
+//				JOptionPane.PLAIN_MESSAGE);
+//				JOptionPane.showMessageDialog(null, "Next", "title",
+				controller.nextAccount();
 			}
 		});
-		
-		refreshBtn.addActionListener(new ActionListener() {
+
+		// 初始化按钮事件
+		initBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				model.addRow(new String[]{"test","????"});
+				// model.addRow(new String[]{"test","????"});
+				controller.initAllAccount();
 			}
 		});
 		/******************************************/
@@ -192,8 +197,12 @@ public class MainWindow extends JFrame {
 		// scrollPane}));
 	}
 
-	public void setCaptcha(Image icon) {
-		captcha.setIcon(new ImageIcon(icon));
+	/*
+	 * 设置账户信息取验证码
+	 */
+	public void setCaptchaAndAccount(UserInfo userInfo) {
+		accountLabel.setText(userInfo.getUsername());
+		captcha.setIcon(new ImageIcon(userInfo.getCaptcha()));
 		captcha.repaint();
 	}
 
@@ -206,19 +215,20 @@ public class MainWindow extends JFrame {
 		for (int j = 0; j < infos.size(); j++) {
 			UserInfo u = infos.get(j);
 			u.setRowIndex(j);
-			data[j] = new String[]{u.getUsername(),u.getStatus()};
+			data[j] = new String[] { u.getUsername(), u.getStatus() };
 		}
 		String[] head = { "username", "status" };
 		model = new DefaultTableModel(data, head);
 		table.setModel(model);
-		
-		((DefaultTableModel)table.getModel()).fireTableDataChanged();
-//		((DefaultTableModel)table.getModel()).fireTableStructureChanged();;
+
+		((DefaultTableModel) table.getModel()).fireTableDataChanged();
+		// ((DefaultTableModel)table.getModel()).fireTableStructureChanged();;
 	}
 
 	public void clearTable() {
 		model.setRowCount(0);
 	}
+
 	/*
 	 * 向控制器发送导入账户文件请求
 	 */

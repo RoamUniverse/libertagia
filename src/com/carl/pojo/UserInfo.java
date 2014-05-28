@@ -15,15 +15,39 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-
 public class UserInfo implements Serializable {
 	private String username;
 	private String password;
 	private transient Image captcha;
 	private transient HttpURLConnection conn = null;
 	private Map<String, String> cookies = new HashMap<String, String>();
-	private transient String status = "初始化";
+	private transient String status = "未操作";
 	private int rowIndex;
+
+	public void addCookie(String key, String value) {
+		cookies.put(key, value);
+	}
+
+	public String getCookie(String key) {
+		return cookies.get(key);
+	}
+
+	/**
+	 * 格式化cookie为字符串
+	 * */
+	public String getCookies() {
+		StringBuffer sb = new StringBuffer();
+		Iterator<String> itr = this.cookies.keySet().iterator();
+		while (itr.hasNext()) {
+			String key = (String) itr.next();
+			String val = this.cookies.get(key);
+			sb.append(" " + key + "=" + val + ";");
+		}
+		if (sb.length() != 0)
+			sb.replace(sb.length() - 1, sb.length(), "");
+		return sb.toString();
+	}
+
 	/**
 	 * 构建请求头
 	 * 
@@ -35,21 +59,6 @@ public class UserInfo implements Serializable {
 				"User-Agent",
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:29.0) Gecko/20100101 Firefox/29.0");
 
-	}
-
-	/**
-	 * 格式化cookie为字符串
-	 * */
-	private String cookies2String() {
-		StringBuffer sb = new StringBuffer();
-		Iterator<String> itr = this.cookies.keySet().iterator();
-		while (itr.hasNext()) {
-			String key = (String) itr.next();
-			String val = this.cookies.get(key);
-			sb.append(" " + key + "=" + val + ";");
-		}
-		sb.replace(sb.length() - 1, sb.length(), "");
-		return sb.toString();
 	}
 
 	public UserInfo(String username, String password) {
@@ -120,7 +129,8 @@ public class UserInfo implements Serializable {
 			String s = String
 					.format("_method=POST&data[Member][email]=%s&data[Member][password]=%s&data[Member][captcha]=%s&remember=1",
 							this.username, this.password, code);
-			String e = URLEncoder.encode(s, "utf-8").replaceAll("%26", "&").replaceAll("%3D", "=");
+			String e = URLEncoder.encode(s, "utf-8").replaceAll("%26", "&")
+					.replaceAll("%3D", "=");
 			conn.getOutputStream().write(e.getBytes());
 			this.buildCookies();
 			conn.getInputStream();
@@ -183,7 +193,7 @@ public class UserInfo implements Serializable {
 	}
 
 	private void requestWithCookies() {
-		conn.setRequestProperty("Cookie", this.cookies2String());
+		// conn.setRequestProperty("Cookie", this.cookies2String());
 	}
 
 	public Image getCaptcha() {
@@ -217,6 +227,9 @@ public class UserInfo implements Serializable {
 	public void setRowIndex(int rowIndex) {
 		this.rowIndex = rowIndex;
 	}
-	
+
+	public void setCaptcha(Image captcha) {
+		this.captcha = captcha;
+	}
 
 }

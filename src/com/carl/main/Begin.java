@@ -9,9 +9,6 @@ import com.carl.pojo.UserInfo;
 import com.carl.window.MainWindow;
 
 public class Begin {
-	private static MainWindow frame;
-	private static Map<String, UserInfo> infos = new HashMap<String, UserInfo>();
-
 	// public static void main(String[] args) {
 	// frame = new MainWindow();
 	// frame.setVisible(true);
