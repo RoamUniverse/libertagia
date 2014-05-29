@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -54,6 +55,7 @@ public class Request {
 	/*
 	 * 初始化连接
 	 */
+	@SuppressWarnings("unused")
 	private static HttpURLConnection initConnection(String urlString,
 			String method) throws IOException {
 		return initConnection(urlString, method, "");
@@ -143,14 +145,19 @@ public class Request {
 	public static String getURLResult(UserInfo userInfo,String url) throws IOException {
 		HttpURLConnection conn = initConnection(url, "GET", userInfo.getCookies());
 		InputStream in = conn.getInputStream();
-		return IOUtils.toString(in);
+		updateCookies(userInfo, conn);
+		return IOUtils.toString(in,"utf-8");
+		
 	}
-
+	
 	/*
 	 * 发送POST请求 附带登录状态cookies 附带参数
 	 */
-	public static String getURLResult(String url, String[][] data,
-			String[][] header) {
-		return null;
+	public static String postURLResult(UserInfo userInfo,String url, Map<String, String> data,
+			Map<String, String> header) throws IOException {
+		HttpURLConnection conn = initConnection(url, "POST", userInfo.getCookies());
+		InputStream in = conn.getInputStream();
+		updateCookies(userInfo, conn);
+		return IOUtils.toString(in,"utf-8");
 	}
 }
