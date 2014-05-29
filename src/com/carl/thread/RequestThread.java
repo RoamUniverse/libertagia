@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.json.JSONArray;
-
 import com.carl.controller.MainController;
 import com.carl.http.ParseHtml;
 import com.carl.http.Request;
