@@ -86,8 +86,14 @@ public class MainController {
 	/*
 	 * 从硬盘反序列化得到UserInfo对象
 	 */
-	public void loadFileForCookies(String path) {
+	public void loadSerializableFile(String path) {
 
+	}
+	/*
+	 * 向硬盘写入UserInfo对象序列化文件
+	 */
+	public void saveSerializableFile(String path) {
+		
 	}
 
 	/*
@@ -116,13 +122,6 @@ public class MainController {
 		for (UserInfo u : infos) {
 			new RequestThread(this,u).start();
 		}
-	}
-
-	/*
-	 * 将UserInfo对象序列化至硬盘
-	 */
-	public void saveFileForCookies(String path) {
-
 	}
 
 	/*

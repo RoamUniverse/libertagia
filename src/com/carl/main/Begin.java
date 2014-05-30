@@ -1,11 +1,8 @@
 package com.carl.main;
 
 import java.awt.EventQueue;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.carl.controller.MainController;
-import com.carl.pojo.UserInfo;
 import com.carl.window.MainWindow;
 
 public class Begin {

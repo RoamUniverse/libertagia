@@ -3,16 +3,12 @@ package com.carl.window;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -20,7 +16,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -30,6 +25,8 @@ import javax.swing.table.DefaultTableModel;
 
 import com.carl.controller.MainController;
 import com.carl.pojo.UserInfo;
+import javax.swing.JToggleButton;
+import javax.swing.JRadioButton;
 
 public class MainWindow extends JFrame {
 
@@ -41,8 +38,6 @@ public class MainWindow extends JFrame {
 	private JLabel captcha;
 	// 验证码输入框
 	private JTextField captchaText;
-	// 刷新按钮
-	private JButton initBtn;
 	// 载入按钮
 	private JButton btnLoadAccount;
 	// 控制器
@@ -53,6 +48,7 @@ public class MainWindow extends JFrame {
 	private DefaultTableModel model;
 	// 用户名标签
 	private JLabel accountLabel;
+	private JButton initBtn;
 
 	/**
 	 * Launch the application.
@@ -92,9 +88,9 @@ public class MainWindow extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		initBtn = new JButton("\u521D\u59CB\u5316");
+		initBtn = new JButton("init");
 		initBtn.setBackground(Color.WHITE);
-		initBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		initBtn.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		initBtn.setBounds(484, 25, 117, 36);
 		contentPane.add(initBtn);
 
@@ -138,12 +134,6 @@ public class MainWindow extends JFrame {
 		btnLoadAccount.setBounds(484, 290, 117, 36);
 		contentPane.add(btnLoadAccount);
 
-		JLabel groupLabel = new JLabel("");
-		groupLabel.setEnabled(false);
-		groupLabel.setBounds(449, 11, 184, 381);
-		groupLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		contentPane.add(groupLabel);
-
 		logTextArea = new JTextArea();
 		logTextArea.setLineWrap(true);
 		logTextArea.setBounds(10, 413, 623, 133);
@@ -175,8 +165,8 @@ public class MainWindow extends JFrame {
 		// next按钮事件
 		nextBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				JOptionPane.PLAIN_MESSAGE);
-//				JOptionPane.showMessageDialog(null, "Next", "title",
+				// JOptionPane.PLAIN_MESSAGE);
+				// JOptionPane.showMessageDialog(null, "Next", "title",
 				controller.nextAccount();
 			}
 		});
@@ -191,10 +181,26 @@ public class MainWindow extends JFrame {
 		/******************************************/
 
 		contentPane.add(lblNewLabel);
-		// contentPane.setFocusTraversalPolicy(new FocusTraversalOnArray(new
-		// Component[]{refreshBtn, table, captcha, captchaText, currentLabel,
-		// nextBtn, accountLabel, scrollPane_1, lblNewLabel, groupLabel,
-		// scrollPane}));
+
+		JButton btnLoadStatus = new JButton("LoadStatus");
+		btnLoadStatus.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		btnLoadStatus.setBounds(484, 226, 117, 36);
+		contentPane.add(btnLoadStatus);
+
+		JRadioButton rdbtnNewRadioButton = new JRadioButton("New radio button");
+		rdbtnNewRadioButton.setBounds(475, 333, 109, 23);
+		contentPane.add(rdbtnNewRadioButton);
+
+		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton(
+				"New radio button");
+		rdbtnNewRadioButton_1.setBounds(475, 359, 109, 23);
+		contentPane.add(rdbtnNewRadioButton_1);
+
+		JLabel groupLabel = new JLabel("");
+		groupLabel.setEnabled(false);
+		groupLabel.setBounds(449, 11, 184, 381);
+		groupLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		contentPane.add(groupLabel);
 	}
 
 	/*
@@ -234,6 +240,20 @@ public class MainWindow extends JFrame {
 	 */
 	private void loadAccountFile(String path) {
 		controller.loadAccountFile(path);
+	}
+
+	/*
+	 * 向控制器发送反序列化请求
+	 */
+	private void loadSerializableFile(String path) {
+		controller.loadSerializableFile(path);
+	}
+
+	/*
+	 * 向控制器发送序列化请求
+	 */
+	private void saveSerializableFile(String path) {
+		controller.saveSerializableFile(path);
 	}
 
 	/*
