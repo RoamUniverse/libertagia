@@ -1,7 +1,12 @@
 package com.carl.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +14,10 @@ import org.apache.commons.io.FileUtils;
 
 import com.carl.message.LogLevel;
 import com.carl.pojo.UserInfo;
+import com.carl.thread.InitThread;
+import com.carl.thread.LoginThread;
 import com.carl.thread.RequestThread;
+import com.carl.thread.VerifyThread;
 import com.carl.window.MainWindow;
 
 /**
@@ -27,41 +35,30 @@ public class MainController {
 	private String lineSeparator = System.getProperty("line.separator", "\n");
 
 	/*
-	 * 根据UserInfo容器中的编号取得账户
-	 */
-	public void getAccountByIndex(int index) {
-
-	}
-
-	/*
-	 * 根据编号取得验证码图片
-	 */
-	public void getCaptchaByIndex(int index) {
-		
-	}
-
-	/*
 	 * 从文件读入账户信息 用于初始化账户信息
 	 */
 	public void loadAccountFile(String path) {
-		this.showLogs(LogLevel.LOG_INFO, "收到载入账户文件消息.正在确认文件....");
+		this.showInfoLogs("收到载入账户文件消息.正在确认文件....");
 		File accountFile = new File(path);
 		if (!accountFile.exists()) {
 			this.showMessage("文件不存在,请重新选择.");
 			return;
 		}
 		try {
-			this.showLogs(LogLevel.LOG_INFO, "文件已确认,正在读取数据....");
+			this.showInfoLogs( "文件已确认,正在读取数据....");
 			List<String> context = FileUtils.readLines(accountFile);
 			this.parseAccountFile(context);
 		} catch (IOException e) {
-			this.showMessage("文件读取失败,请重试.");
+			this.showMessage("程序发生内部错误,请联系作者!!!");
 			e.printStackTrace();
 		}
 	}
 
+	/*
+	 * 解析账户文件
+	 */
 	private void parseAccountFile(List<String> context) {
-		this.showLogs(LogLevel.LOG_INFO, "文件已读取完毕,正在解析数据....");
+		this.showInfoLogs( "文件已读取完毕,正在解析数据....");
 		int success = 0, fail = 0, count = context.size();
 		for (String account : context) {
 			String[] tmp = account.split(" ");
@@ -77,8 +74,8 @@ public class MainController {
 			this.showMessage(String.format("解析结果: 总数 %d , 成功 %d , 失败 %d",
 					count, success, fail));
 		} else {
-			this.window.showAllAccountInTable(infos);
-			this.showLogs(LogLevel.LOG_INFO, String.format(
+			this.updateTable();
+			this.showInfoLogs(String.format(
 					"解析结果: 总数 %d , 成功 %d , 失败 %d", count, success, fail));
 		}
 	}
@@ -86,65 +83,151 @@ public class MainController {
 	/*
 	 * 从硬盘反序列化得到UserInfo对象
 	 */
+	@SuppressWarnings("unchecked")
 	public void loadSerializableFile(String path) {
-
+		showInfoLogs("开始读取状态文件....<PATH>:"+path);
+		File load = new File(path);
+		ObjectInputStream ois = null;
+		try {
+			ois = new ObjectInputStream(new FileInputStream(load));
+			infos = (List<UserInfo>) ois.readObject();
+			ois.close();
+			for (UserInfo u : infos) {
+				System.out.println(u);
+			}
+			this.updateTable();
+			showInfoLogs("状态文件读取完毕,开始校验登录状态....");
+			verifyAllAccount();
+		} catch (FileNotFoundException e) {
+			showMessage("文件不存在或不可读,请重试.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			showMessage("程序发生内部错误,请联系作者!!!");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			showMessage("程序发生内部错误,请联系作者!!!");
+			e.printStackTrace();
+		} finally {
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					showMessage("程序发生内部错误,请联系作者!!!");
+					e.printStackTrace();
+				}
+			}
+		}
 	}
+
 	/*
 	 * 向硬盘写入UserInfo对象序列化文件
 	 */
 	public void saveSerializableFile(String path) {
-		
+		File save = new File(path);
+		ObjectOutputStream oos = null;
+		showInfoLogs("写入状态文件.... <PATH>:"+path);
+		try {
+			oos = new ObjectOutputStream(new FileOutputStream(save));
+			oos.writeObject(infos);
+			oos.flush();
+			showInfoLogs("状态文件已保存...");
+		} catch (FileNotFoundException e) {
+			showMessage("文件不存在或不可读,请重试.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			showMessage("程序发生内部错误,请联系作者!!!");
+			e.printStackTrace();
+		} finally {
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					showMessage("程序发生内部错误,请联系作者!!!");
+					e.printStackTrace();
+				}
+			}
+		}
+		infos = null;
 	}
 
 	/*
 	 * 收到用户输入的验证码
 	 */
-	public void pushCaotcha(int index, String captcha) {
-		// TODO 启动线程 进行登陆cookie获取
-//		UserInfo u = infos.get(index);
-		
+	public void Login(UserInfo userInfo, String captcha) {
+		userInfo.setInprogress(1);
+		RequestThread thread = new LoginThread(this, userInfo, captcha);
+		showInfoLogs(String.format("<Thread-ID:%d> 账户:%s 正在登录......", thread.getId(),userInfo.getUsername()));
+		thread.start();
 	}
-	
+
+	/*
+	 * 设置下个账户
+	 */
 	public void nextAccount() {
 		for (UserInfo u : infos) {
-			if("未操作".equals(u.getStatus())){
+			if (u.getInprogress()==0 & "初始化完成".equals(u.getStatus())) {
 				window.setCaptchaAndAccount(u);
 				return;
 			}
 		}
-		this.showLogs(LogLevel.LOG_INFO, "无账户需要初始化.");
+		this.showMessage("无账户需要登录.");
 	}
-	
+
+	/*
+	 * 校验所有账户
+	 */
+	public void verifyAllAccount() {
+		for (UserInfo u : infos) {
+			RequestThread thread = new VerifyThread(this, u);
+			showInfoLogs(String.format("<Thread-ID:%d> 账户:%s 正在校验状态......", thread.getId(),u.getUsername()));
+			thread.start();
+		}
+	}
 	/*
 	 * 初始化所有账户数据
 	 */
 	public void initAllAccount() {
 		for (UserInfo u : infos) {
-			new RequestThread(this,u).start();
+			RequestThread thread = new InitThread(this, u);
+			showInfoLogs(String.format("<Thread-ID:%d> 账户:%s 正在初始化......", thread.getId(),u.getUsername()));
+			thread.start();
 		}
 	}
 
 	/*
-	 * 回调页面,显示信息
+	 * 回调页面,显示弹出框
 	 */
 	public void showMessage(String msg) {
-		this.showLogs(LogLevel.LOG_ERROR, msg);
+		this.showErrorLogs(msg);
 		this.window.showMessage(msg);
 	}
-
 	/*
-	 * 回调页面,显示日志
+	 * 回调页面,显示Info
 	 */
-	public void showLogs(String level, String log) {
-		this.window.showLogs(level + log + lineSeparator);
+	public void showInfoLogs(String log) {
+		this.window.showLogs(LogLevel.LOG_INFO + log + lineSeparator);
+	}
+	/*
+	 * 回调页面,显示Error
+	 */
+	public void showErrorLogs(String log) {
+		this.window.showLogs(LogLevel.LOG_ERROR + log + lineSeparator);
 	}
 
 	/*
-	 * 更新表格数据
+	 * 更新表格中单个用户数据
 	 */
 	public void updateTable(UserInfo userInfo) {
-		
+		window.showAccountInTable(userInfo);
 	}
+	
+	/*
+	 * 更新表格中所有用户数据
+	 */
+	public void updateTable() {
+		window.showAllAccountInTable(infos);
+	}
+
 	public List<UserInfo> getInfos() {
 		return infos;
 	}

@@ -25,7 +25,10 @@ public class ParseHtml {
 		return null;
 	}
 	
-	public String getNextTask(String result) {
+	/*
+	 * 取得json中下个对象的token
+	 */
+	public static String getNextTask(String result) {
 		RE re = new RE(); // 新建正则表达式对象;
 		RECompiler compiler = new RECompiler(); // 新建编译对象;
 		re.setProgram(compiler.compile("\"next_task\":\"[\\d\\w=]+")); // 编译
@@ -37,6 +40,13 @@ public class ParseHtml {
 			return tmp;
 		}
 		return null;
+	}
+	
+	/*
+	 * 验证登录状态是否有效
+	 */
+	public static boolean verifyLoginStatus(String result ,String find) {
+		return result.contains(find);
 	}
 	public static void main(String[] args) throws IOException, XPatherException {
 //		String result = Request.getURLResult("", "http://www.baidu.com");

@@ -23,7 +23,7 @@ public class Request {
 	public static final String captcha = "http://libertagia.com/img/captcha.jpg";
 	public static final String task = "http://libertagia.com/office/tasks";
 	public static final String task_run = "http://tasks.libertagia.com";
-
+	public static final String index = "http://libertagia.com/office/dashboard/index";
 	public static void main(String[] args) throws IOException {
 		// UserInfo userInfo = new UserInfo("1114486604@qq.com", "567890");
 		// Request.getInitCookiesAndCaptcha(userInfo);
@@ -129,9 +129,11 @@ public class Request {
 				val = val.substring(0, val.indexOf(";"));
 				String cKey = val.substring(0, val.indexOf("="));
 				String cVal = val.substring(val.indexOf("=") + 1, val.length());
-				// System.err.println(String.format("add cookie %s = %s",
-				// cKey,cVal));
-				userInfo.addCookie(cKey, cVal);
+				if("deleted".equals(cVal)){
+					userInfo.deleteCookie(cKey);
+				}else {
+					userInfo.addCookie(cKey, cVal);
+				}
 			}
 		}
 	}
