@@ -45,7 +45,7 @@ public class MainController {
 			return;
 		}
 		try {
-			this.showInfoLogs( "文件已确认,正在读取数据....");
+			this.showInfoLogs("文件已确认,正在读取数据....");
 			List<String> context = FileUtils.readLines(accountFile);
 			this.parseAccountFile(context);
 		} catch (IOException e) {
@@ -58,7 +58,7 @@ public class MainController {
 	 * 解析账户文件
 	 */
 	private void parseAccountFile(List<String> context) {
-		this.showInfoLogs( "文件已读取完毕,正在解析数据....");
+		this.showInfoLogs("文件已读取完毕,正在解析数据....");
 		int success = 0, fail = 0, count = context.size();
 		for (String account : context) {
 			String[] tmp = account.split(" ");
@@ -75,8 +75,8 @@ public class MainController {
 					count, success, fail));
 		} else {
 			this.updateTable();
-			this.showInfoLogs(String.format(
-					"解析结果: 总数 %d , 成功 %d , 失败 %d", count, success, fail));
+			this.showInfoLogs(String.format("解析结果: 总数 %d , 成功 %d , 失败 %d",
+					count, success, fail));
 		}
 	}
 
@@ -85,7 +85,7 @@ public class MainController {
 	 */
 	@SuppressWarnings("unchecked")
 	public void loadSerializableFile(String path) {
-		showInfoLogs("开始读取状态文件....<PATH>:"+path);
+		showInfoLogs("开始读取状态文件....<PATH>:" + path);
 		File load = new File(path);
 		ObjectInputStream ois = null;
 		try {
@@ -125,7 +125,7 @@ public class MainController {
 	public void saveSerializableFile(String path) {
 		File save = new File(path);
 		ObjectOutputStream oos = null;
-		showInfoLogs("写入状态文件.... <PATH>:"+path);
+		showInfoLogs("写入状态文件.... <PATH>:" + path);
 		try {
 			oos = new ObjectOutputStream(new FileOutputStream(save));
 			oos.writeObject(infos);
@@ -156,7 +156,6 @@ public class MainController {
 	public void Login(UserInfo userInfo, String captcha) {
 		userInfo.setInprogress(1);
 		RequestThread thread = new LoginThread(this, userInfo, captcha);
-		showInfoLogs(String.format("<Thread-ID:%d> 账户:%s 正在登录......", thread.getId(),userInfo.getUsername()));
 		thread.start();
 	}
 
@@ -165,7 +164,7 @@ public class MainController {
 	 */
 	public void nextAccount() {
 		for (UserInfo u : infos) {
-			if (u.getInprogress()==0 & "初始化完成".equals(u.getStatus())) {
+			if (u.getInprogress() == 0 & "初始化完成".equals(u.getStatus())) {
 				window.setCaptchaAndAccount(u);
 				return;
 			}
@@ -178,19 +177,16 @@ public class MainController {
 	 */
 	public void verifyAllAccount() {
 		for (UserInfo u : infos) {
-			RequestThread thread = new VerifyThread(this, u);
-			showInfoLogs(String.format("<Thread-ID:%d> 账户:%s 正在校验状态......", thread.getId(),u.getUsername()));
-			thread.start();
+			new VerifyThread(this, u).start();
 		}
 	}
+
 	/*
 	 * 初始化所有账户数据
 	 */
 	public void initAllAccount() {
 		for (UserInfo u : infos) {
-			RequestThread thread = new InitThread(this, u);
-			showInfoLogs(String.format("<Thread-ID:%d> 账户:%s 正在初始化......", thread.getId(),u.getUsername()));
-			thread.start();
+			new InitThread(this, u).start();
 		}
 	}
 
@@ -201,12 +197,14 @@ public class MainController {
 		this.showErrorLogs(msg);
 		this.window.showMessage(msg);
 	}
+
 	/*
 	 * 回调页面,显示Info
 	 */
 	public void showInfoLogs(String log) {
 		this.window.showLogs(LogLevel.LOG_INFO + log + lineSeparator);
 	}
+
 	/*
 	 * 回调页面,显示Error
 	 */
@@ -220,7 +218,7 @@ public class MainController {
 	public void updateTable(UserInfo userInfo) {
 		window.showAccountInTable(userInfo);
 	}
-	
+
 	/*
 	 * 更新表格中所有用户数据
 	 */

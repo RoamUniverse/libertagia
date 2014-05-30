@@ -1,39 +1,61 @@
 package com.carl.thread;
 
 import com.carl.controller.MainController;
-import com.carl.message.LogLevel;
 import com.carl.pojo.UserInfo;
 
 public abstract class RequestThread extends Thread {
 	protected MainController controller;
 	protected UserInfo userInfo;
-	public RequestThread(MainController controller, UserInfo userInfo) {
+	// 启动延迟时间
+	protected int delay;
+	// 重试次数
+	protected int tryTimes = 1;
+
+	public RequestThread(MainController controller, UserInfo userInfo,
+			int delay, int tryTimes) {
 		super();
 		this.controller = controller;
 		this.userInfo = userInfo;
+		this.delay = delay;
+		this.tryTimes = tryTimes;
+	}
+
+	public RequestThread(MainController controller, UserInfo userInfo) {
+		this(controller, userInfo, 0, 0);
 	}
 
 	/*
 	 * 线程任务
 	 */
 	public abstract void threadTask();
-	
+
 	/*
 	 * 输出反馈信息
 	 */
-	public  void showLogs(boolean isError,String msg){
+	public void showLogs(boolean isError, String msg) {
+
 		if (isError) {
 			controller.showErrorLogs(msg);
-		}else {
+		} else {
 			controller.showInfoLogs(msg);
 		}
 	}
-	
+
+	@Override
+	public synchronized void start() {
+		try {
+			Thread.sleep(delay);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		super.start();
+	}
+
 	public void updateSatus(String status) {
 		userInfo.setStatus(status);
 		controller.updateTable(userInfo);
 	}
-	
+
 	public void run() {
 		threadTask();
 	}
