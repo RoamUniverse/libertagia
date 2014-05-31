@@ -21,7 +21,7 @@ public abstract class RequestThread extends Thread {
 	}
 
 	public RequestThread(MainController controller, UserInfo userInfo) {
-		this(controller, userInfo, 0, 0);
+		this(controller, userInfo, 0, 1);
 	}
 
 	/*
@@ -38,17 +38,34 @@ public abstract class RequestThread extends Thread {
 	public abstract void threadTask();
 
 	/*
-	 * 输出反馈信息
+	 * 输出日志
 	 */
-	public void showLogs(boolean isError, String msg) {
-
+	private void showLogs(boolean isError, String msg) {
+		if(userInfo!=null){
+			msg = String.format("<Thread-ID:%d>\t账户:%s\t%s", this.getId(),
+					userInfo.getUsername(),msg);
+		}else {
+			msg = String.format("<Thread-ID:%d>\t%s", this.getId(),msg);
+		}
 		if (isError) {
 			controller.showErrorLogs(msg);
 		} else {
 			controller.showInfoLogs(msg);
 		}
 	}
-
+	/*
+	 * 输出日志
+	 */
+	public void showError(String msg) {
+		showLogs(true, msg);
+	}
+	/*
+	 * 输出日志
+	 */
+	public void showInfo(String msg) {
+		showLogs(false, msg);
+	}
+	
 	@Override
 	public synchronized void start() {
 		try {
@@ -60,7 +77,13 @@ public abstract class RequestThread extends Thread {
 	}
 
 	public void run() {
-		threadTask();
+		if(!this.getClass().equals(GlobalAutoStayThread.class)){
+			controller.threadRun();
+			threadTask();
+			controller.threadDone();
+		}else {
+			threadTask();
+		}
 	}
 
 	public void setController(MainController controller) {

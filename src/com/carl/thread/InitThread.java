@@ -3,8 +3,10 @@ package com.carl.thread;
 import java.io.IOException;
 
 import com.carl.controller.MainController;
+import com.carl.http.ParseHtml;
 import com.carl.http.Request;
 import com.carl.message.ThreadMessage;
+import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
 
 public class InitThread extends RequestThread {
@@ -21,22 +23,38 @@ public class InitThread extends RequestThread {
 	@Override
 	public void threadTask() {
 		try {
-			showLogs(false, String.format(
-					"<Thread-ID:%d> 账户:%s 正在初始化....当前尝试次数:%d....", this.getId(),
-					userInfo.getUsername(), tryTimes));
+			//置进入初始化状态
+			updateUserInfo(UserMessage.UserStatus.IN_INIT, UserMessage.UserProgress.IN_INIT);
+			showInfo("正在校验是否已登录...");
+			String result = Request.getURLResult(userInfo, Request.index);
+			if (ParseHtml.verifyLoginStatus(result, "Welcome")) {
+				// 判断已登录,置状态已登录.
+				updateUserInfo(UserMessage.UserStatus.IS_LOGIN, UserMessage.UserProgress.IS_LOGIN);
+				showInfo("已登录.....开始自动任务....");
+				new InitTaskThread(controller, userInfo).start();
+				return;
+			}
+			showInfo("未登录....");
+			showInfo("正在初始化....当前尝试次数:" + tryTimes + "....");
 			Request.getInitCookiesAndCaptcha(userInfo);
-			userInfo.setStatus("初始化完成");
-			controller.updateTable(userInfo);
-			showLogs(false, String.format("<Thread-ID:%d> 账户:%s\t初始化完成.....",
-					this.getId(), userInfo.getUsername()));
+			if (userInfo.getCaptcha()!=null) {
+				//初始化完成,置状态初始化完成.
+				updateUserInfo(UserMessage.UserStatus.DONE_INIT, UserMessage.UserProgress.DONE_INIT);
+				showInfo("初始化完成.....");
+				return;
+			}
+			//初始化失败,置状态未登录
+			updateUserInfo(UserMessage.UserStatus.FAIL_INIT, UserMessage.UserProgress.NO_LOGIN);				
+			showInfo("初始化失败.....");
 		} catch (IOException e) {
+			//初始化异常,置状态未登录.
+			updateUserInfo(UserMessage.UserStatus.FAIL_INIT, UserMessage.UserProgress.NO_LOGIN);
 			if (this.tryTimes <= ThreadMessage.MAX_TRY_TIME) {
-				showLogs(true, "用户名:" + userInfo.getUsername()
-						+ "\t初始化状态发生错误,请检查网络..程序将在2秒后重试...");
+				showError("初始化状态发生错误,请检查网络..程序将在2秒后重试...");
 				new InitThread(controller, userInfo, 2000, tryTimes + 1).start();
 			} else {
-				showLogs(true, "用户名:" + userInfo.getUsername()
-						+ "\t初始化状态发生错误,请检查网络..程序已重试超过"+ThreadMessage.MAX_TRY_TIME+"次,将停止本次操作....");
+				showError("初始化状态发生错误,请检查网络..程序已重试超过"
+						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
 			}
 		}
 	}

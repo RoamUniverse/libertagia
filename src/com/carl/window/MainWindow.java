@@ -1,7 +1,6 @@
 package com.carl.window;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -27,8 +25,8 @@ import javax.swing.table.DefaultTableModel;
 
 import com.carl.controller.MainController;
 import com.carl.pojo.UserInfo;
-import javax.swing.JSplitPane;
-import javax.swing.border.LineBorder;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -56,8 +54,6 @@ public class MainWindow extends JFrame {
 	private JButton btnLoadStatus;
 	// 序列化按钮
 	private JButton btnSaveStatus;
-	// 首个账户标示
-	private boolean first = false;
 	// 登录按钮
 	private JButton btnLogin;
 	// 当前用户
@@ -74,6 +70,8 @@ public class MainWindow extends JFrame {
 	private JButton btnStartTask;
 	private JButton btnOpenAutoStay;
 	private JLabel lblOperation;
+	private JLabel lblThread;
+	private JLabel lblThreadCount;
 
 	public MainWindow() {
 		init();
@@ -125,11 +123,12 @@ public class MainWindow extends JFrame {
 		logTextArea.setWrapStyleWord(true);
 		logTextArea.setEditable(false);
 		logTextArea.setLineWrap(true);
-		logTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
+//		logTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
 		logTextArea.setBounds(0, 0, 628, 283);
 		// 滚动面板
 		scrollOutput = new JScrollPane(logTextArea);
 		scrollOutput.setBounds(298, 183, 628, 283);
+		scrollOutput.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
 		contentPane.add(scrollOutput);
 //		scrollOutput.add(logTextArea);
 	}
@@ -149,7 +148,7 @@ public class MainWindow extends JFrame {
 		BtnInit.setBackground(Color.WHITE);
 		BtnInit.setFont(new Font("Dialog", Font.BOLD, 13));
 		BtnInit.setBounds(135, 13, 117, 36);
-		panelDataOperation.add(BtnInit);
+//		panelDataOperation.add(BtnInit);
 
 		btnLoadAccount = new JButton("LoadAccount");
 		btnLoadAccount.setFont(new Font("Dialog", Font.BOLD, 13));
@@ -159,7 +158,7 @@ public class MainWindow extends JFrame {
 		btnSaveStatus = new JButton("SaveStatus");
 		btnSaveStatus.setFont(new Font("Dialog", Font.BOLD, 13));
 		btnSaveStatus.setBackground(Color.WHITE);
-		btnSaveStatus.setBounds(135, 62, 117, 36);
+		btnSaveStatus.setBounds(138, 13, 117, 36);
 		panelDataOperation.add(btnSaveStatus);
 
 		btnLoadStatus = new JButton("LoadStatus");
@@ -174,8 +173,18 @@ public class MainWindow extends JFrame {
 
 		btnOpenAutoStay = new JButton("OpenAutoStay");
 		btnOpenAutoStay.setFont(new Font("Dialog", Font.BOLD, 13));
-		btnOpenAutoStay.setBounds(135, 111, 117, 36);
+		btnOpenAutoStay.setBounds(138, 62, 117, 36);
 		panelDataOperation.add(btnOpenAutoStay);
+		
+		lblThread = new JLabel("Thread:");
+		lblThread.setBounds(138, 120, 61, 16);
+		lblThread.setFont(new Font("Dialog", Font.BOLD, 13));
+		panelDataOperation.add(lblThread);
+		
+		lblThreadCount = new JLabel("0");
+		lblThreadCount.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblThreadCount.setBounds(200, 120, 39, 16);
+		panelDataOperation.add(lblThreadCount);
 	}
 
 	/*
@@ -203,7 +212,8 @@ public class MainWindow extends JFrame {
 		panelAccountOperation.add(captcha);
 
 		// 验证码输入框
-		captchaText = new JTextField(20);
+		captchaText = new JTextField(7);
+		captchaText.setEnabled(false);
 		captchaText.setBounds(217, 66, 120, 43);
 		panelAccountOperation.add(captchaText);
 
@@ -228,6 +238,7 @@ public class MainWindow extends JFrame {
 
 		// 登录按钮
 		btnLogin = new JButton("Login");
+		btnLogin.setEnabled(false);
 		btnLogin.setFont(new Font("Dialog", Font.BOLD, 13));
 		btnLogin.setBackground(Color.WHITE);
 		btnLogin.setBounds(217, 118, 117, 36);
@@ -245,7 +256,16 @@ public class MainWindow extends JFrame {
 	 */
 	private void initEvents() {
 		/*************** 控件事件代码 *****************/
-
+		//验证码输入框回车事件
+		captchaText.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode()==10){
+					btnLogin.doClick();
+				}
+			}
+		});
+		
 		// loadAccount按钮事件
 		btnLoadAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -275,6 +295,8 @@ public class MainWindow extends JFrame {
 					controller.Login(currentUserInfo, code);
 					captchaText.setText("");
 					captcha.setIcon(null);
+					accountLabel.setText("");
+					nextBtn.doClick();
 					return;
 				}
 				showMessage("验证码为空,请重试.");
@@ -321,6 +343,24 @@ public class MainWindow extends JFrame {
 				controller.startTask();
 			}
 		});
+		
+		btnOpenAutoStay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//全局自动任务线程
+				String title = btnOpenAutoStay.getText();
+				if ("OpenAutoStay".equals(title)) {
+					btnOpenAutoStay.setText("StopAutoStay");
+					btnOpenAutoStay.setForeground(Color.RED);
+					controller.runGlobalThread();
+					setAllEnable(false);
+				}else {
+					btnOpenAutoStay.setText("OpenAutoStay");
+					btnOpenAutoStay.setForeground(Color.BLACK);
+					controller.shutdownGlobalThread();
+					setAllEnable(true);
+				}
+			}
+		});
 		/******************************************/
 	}
 
@@ -332,6 +372,8 @@ public class MainWindow extends JFrame {
 		accountLabel.setText(userInfo.getUsername());
 		captcha.setIcon(new ImageIcon(userInfo.getCaptcha()));
 		captcha.repaint();
+		btnLogin.setEnabled(true);
+		captchaText.setEnabled(true);
 	}
 
 	/*
@@ -367,6 +409,18 @@ public class MainWindow extends JFrame {
 	}
 
 	/*
+	 * 全局监视组件激活禁用
+	 */
+	public void setAllEnable(boolean b) {
+		captchaText.setEnabled(b);
+		nextBtn.setEnabled(b);
+		btnLoadAccount.setEnabled(b);
+		btnLoadStatus.setEnabled(b);
+		btnLogin.setEnabled(b);
+		btnStartTask.setEnabled(b);
+		btnSaveStatus.setEnabled(b);
+	}
+	/*
 	 * 向控制器发送导入账户文件请求
 	 */
 	private void loadAccountFile(String path) {
@@ -391,6 +445,9 @@ public class MainWindow extends JFrame {
 	 * 输出日志
 	 */
 	public void showLogs(String log) {
+		if (logTextArea.getLineCount()> 100) {
+			logTextArea.setText(null);
+		}
 		logTextArea.append(log);
 		JScrollBar bar = scrollOutput.getVerticalScrollBar();
 		bar.setValue(bar.getMaximum());
@@ -403,16 +460,26 @@ public class MainWindow extends JFrame {
 		JOptionPane.showMessageDialog(null, msg, "警告",
 				JOptionPane.PLAIN_MESSAGE);
 	}
-
+	public synchronized void updateThread(int count,boolean isGlobalRun) {
+		if (!isGlobalRun) {
+			if (count==0) {
+				btnOpenAutoStay.setEnabled(true);
+			}else {
+				btnOpenAutoStay.setEnabled(false);
+			}
+		}
+		lblThreadCount.setText(""+count);
+	}
+	/*
+	 * 禁用登录按钮
+	 */
+	public void setLoginBtnAble(boolean b) {
+		btnLogin.setEnabled(b);
+		captchaText.setEnabled(b);
+		
+	}
 	public void setController(MainController controller) {
 		this.controller = controller;
 	}
 
-	public boolean isFirst() {
-		return first;
-	}
-
-	public void setFirst(boolean first) {
-		this.first = first;
-	}
 }

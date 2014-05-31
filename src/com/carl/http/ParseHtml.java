@@ -97,10 +97,22 @@ public class ParseHtml {
 		
 	}
 	/*
+	 * HTML判断任务是否完成
+	 */
+	public static boolean isCompletedTask(String result) {
+		return result.contains("Your daily tasks have been completed successfully");
+	}
+	/*
 	 * 验证登录状态是否有效
 	 */
 	public static boolean verifyLoginStatus(String result ,String find) {
 		return result.contains(find);
+	}
+	/*
+	 * 验证登录状态是否有效
+	 */
+	public static boolean verifyLoginStatus(String result) {
+		return result.contains("Welcome");
 	}
 	public static void main(String[] args) {
 		String s = "[\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8ZDNkeEdldEI4RG1ZMWQ5Qw==\",\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8V09Pc3JnTnNUTEdVZlQ3VA==\",\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8ZmE1YjA1ZWJhMjRlOTk0Mg==\"]";

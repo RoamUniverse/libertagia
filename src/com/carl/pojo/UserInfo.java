@@ -6,14 +6,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.carl.message.UserMessage;
+
 public class UserInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String username;
 	private String password;
 	private transient Image captcha;
 	private Map<String, String> cookies = new HashMap<String, String>();
-	private transient String status = "未登录"; //实时状态信息
-	private int inprogress = 0; //工作流状态
+	private transient String status = UserMessage.UserStatus.NO_LOGIN; //实时状态信息
+	private transient int inprogress = UserMessage.UserProgress.NO_LOGIN; //工作流状态
 	private int rowIndex;
 	public void addCookie(String key, String value) {
 		cookies.put(key, value);
@@ -76,12 +78,13 @@ public class UserInfo implements Serializable {
 		this.captcha = captcha;
 	}
 
+
 	@Override
 	public String toString() {
 		return "UserInfo [username=" + username + ", password=" + password
-				+ ", cookies=" + cookies + "]";
+				+ ", cookies=" + cookies + ", status=" + status
+				+ ", inprogress=" + inprogress + "]";
 	}
-
 	public void setStatus(String status) {
 		this.status = status;
 	}

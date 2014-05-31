@@ -15,11 +15,11 @@ import org.apache.commons.io.FileUtils;
 import com.carl.message.LogLevel;
 import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
+import com.carl.thread.GlobalAutoStayThread;
 import com.carl.thread.InitTaskThread;
 import com.carl.thread.InitThread;
 import com.carl.thread.LoginThread;
 import com.carl.thread.RequestThread;
-import com.carl.thread.VerifyThread;
 import com.carl.window.MainWindow;
 
 /**
@@ -35,7 +35,11 @@ public class MainController {
 	private MainWindow window;
 	// 系统换行符
 	private String lineSeparator = System.getProperty("line.separator", "\n");
-
+	//当前业务线程数
+	private int threadCount = 0;
+	//全局任务线程
+	private GlobalAutoStayThread thread;
+	
 	/*
 	 * 从文件读入账户信息 用于初始化账户信息
 	 */
@@ -61,6 +65,7 @@ public class MainController {
 	 */
 	private void parseAccountFile(List<String> context) {
 		this.showInfoLogs("文件已读取完毕,正在解析数据....");
+		infos.clear();
 		int success = 0, fail = 0, count = context.size();
 		for (String account : context) {
 			String[] tmp = account.split(" ");
@@ -80,6 +85,7 @@ public class MainController {
 			this.showInfoLogs(String.format("解析结果: 总数 %d , 成功 %d , 失败 %d",
 					count, success, fail));
 		}
+		initAllAccount();
 	}
 
 	/*
@@ -94,12 +100,9 @@ public class MainController {
 			ois = new ObjectInputStream(new FileInputStream(load));
 			infos = (List<UserInfo>) ois.readObject();
 			ois.close();
-			for (UserInfo u : infos) {
-				System.out.println(u);
-			}
 			this.updateTable();
 			showInfoLogs("状态文件读取完毕,开始校验登录状态....");
-			verifyAllAccount();
+			initAllAccount();
 		} catch (FileNotFoundException e) {
 			showMessage("文件不存在或不可读,请重试.");
 			e.printStackTrace();
@@ -156,7 +159,6 @@ public class MainController {
 	 * 收到用户输入的验证码
 	 */
 	public void Login(UserInfo userInfo, String captcha) {
-		userInfo.setInprogress(1);
 		RequestThread thread = new LoginThread(this, userInfo, captcha);
 		thread.start();
 	}
@@ -166,37 +168,63 @@ public class MainController {
 	 */
 	public void nextAccount() {
 		for (UserInfo u : infos) {
-			if (u.getInprogress() == UserMessage.UserProgress.NO_LOGIN) {
+			//筛选已完成初始化的账户
+			if (u.getInprogress() == UserMessage.UserProgress.DONE_INIT) {
 				window.setCaptchaAndAccount(u);
 				return;
 			}
 		}
-		this.showMessage("无账户需要登录.");
+		//无账户则禁用
+		window.setLoginBtnAble(false);
+		this.showInfoLogs("无账户需要登录..已启动初始化账户线程...");
+		initAllAccount();
 	}
-
+	
 	/*
-	 * 校验所有账户
+	 * 开启新线程
 	 */
-	public void verifyAllAccount() {
-		for (UserInfo u : infos) {
-			new VerifyThread(this, u).start();
+	public synchronized void threadRun(){
+		threadCount += 1;
+		window.updateThread(threadCount, (thread != null) ? thread.isAlive()
+				: false);
+	}
+	/*
+	 * 开启新线程
+	 */
+	public synchronized void threadDone(){
+		threadCount -= 1;
+		window.updateThread(threadCount, (thread != null) ? thread.isAlive()
+				: false);
+	}
+	
+	public void runGlobalThread() {
+		thread = new GlobalAutoStayThread(this, null, true);
+		thread.start();
+	}
+	public void shutdownGlobalThread() {
+		while(thread.isAlive()){
+			thread.setStopRequest(false);
 		}
 	}
-
 	/*
 	 * 所有账户开始任务
 	 */
 	public void startTask() {
 		for (UserInfo userInfo : infos) {
-			new InitTaskThread(this, userInfo).start();
+			if (userInfo.getInprogress()==UserMessage.UserProgress.IS_LOGIN) {
+				new InitTaskThread(this, userInfo).start();
+			}
 		}
 	}
 	/*
 	 * 初始化所有账户数据
 	 */
 	public void initAllAccount() {
-		for (UserInfo u : infos) {
-			new InitThread(this, u).start();
+		for (UserInfo userInfo : infos) {
+			//筛选状态未未登录的账户
+			if(userInfo.getInprogress()==UserMessage.UserProgress.NO_LOGIN){
+				new InitThread(this, userInfo).start();
+			}
 		}
 	}
 
