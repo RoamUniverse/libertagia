@@ -1,12 +1,9 @@
 package com.carl.http;
 
-import java.io.IOException;
-
 import org.apache.regexp.RE;
 import org.apache.regexp.RECompiler;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
-import org.htmlcleaner.XPatherException;
 
 public class ParseHtml {
 	/*
@@ -42,20 +39,85 @@ public class ParseHtml {
 		return null;
 	}
 	
+	public static int getTaskCaptcha(String result) {
+		RE re = new RE(); // 新建正则表达式对象;
+		RECompiler compiler = new RECompiler(); // 新建编译对象;
+		re.setProgram(compiler
+				.compile("<span id=\"cap_text\".*>\\d+\\s*.+\\s\\d+")); // 编译
+		boolean bool = re.match(result); // 测试是否匹配;
+		System.out.println(bool);
+		if (bool) {
+			String tmp = re.getParen(0).replaceAll(
+					"<span id=\"cap_text\" class=\"input-group-addon\">", "");
+			String[] a = tmp.split(" ");
+			if (a.length != 3) {
+				return 0;
+			}
+			if (a[1].equals("+")) {
+				int one = Integer.parseInt(a[0]);
+				int two = Integer.parseInt(a[2]);
+				return one+two;
+			}else if (a[1].equals("-")) {
+				int one = Integer.parseInt(a[0]);
+				int two = Integer.parseInt(a[2]);
+				return one - two;
+			}
+			
+		}
+		return -1;
+	}
+	
+	/*
+	 * 获取json中已完成任务个数
+	 */
+	public static int getDoneTaskCount(String result) {
+		RE re = new RE(); // 新建正则表达式对象;
+		RECompiler compiler = new RECompiler(); // 新建编译对象;
+		re.setProgram(compiler.compile("\\[.*,*\\]")); // 编译
+		boolean bool = re.match(result); // 测试是否匹配;
+		System.out.println(bool);
+		if (bool) {
+			String tmp = re.getParen(0);
+			System.out.println(tmp);
+			tmp = tmp.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
+			if ("".equals(tmp)) {
+				return 0;
+			}
+			String[] a = tmp.split(",");
+			System.out.println(a.length);
+			return a.length;
+		}
+		return 0;
+	}
+	/*
+	 * 获取json中是否已完成任务
+	 */
+	public static boolean isDoneTask(String result) {
+		return !result.contains("\"finished\":false");
+		
+	}
 	/*
 	 * 验证登录状态是否有效
 	 */
 	public static boolean verifyLoginStatus(String result ,String find) {
 		return result.contains(find);
 	}
-	public static void main(String[] args) throws IOException, XPatherException {
-//		String result = Request.getURLResult("", "http://www.baidu.com");
-//		System.out.println(result);
-//		HtmlCleaner c = new HtmlCleaner();
-//		TagNode node =c.clean(result);
-//		TagNode[] t = node.getElementsByAttValue("id", "lk", true, false);
-//		for (int i = 0; i < t.length; i++) {
-//			System.out.println("i="+i+"\t"+ c.getInnerHtml(t[i]));
-//		}
+	public static void main(String[] args) {
+		String s = "[\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8ZDNkeEdldEI4RG1ZMWQ5Qw==\",\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8V09Pc3JnTnNUTEdVZlQ3VA==\",\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8ZmE1YjA1ZWJhMjRlOTk0Mg==\"]";
+		RE re = new RE(); // 新建正则表达式对象;
+		RECompiler compiler = new RECompiler(); // 新建编译对象;
+		re.setProgram(compiler.compile("\\[.+,*\\]")); // 编译
+		boolean bool = re.match(s); // 测试是否匹配;
+		System.out.println(bool);
+		if (bool) {
+			String tmp = re.getParen(0);
+			System.out.println(tmp);
+			tmp = tmp.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
+			String[] a = tmp.split(",");
+			System.out.println(a.length);
+			for (String string : a) {
+				System.out.println(string);
+			}
+		}
 	}
 }

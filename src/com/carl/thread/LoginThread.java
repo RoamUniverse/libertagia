@@ -6,6 +6,7 @@ import com.carl.controller.MainController;
 import com.carl.http.ParseHtml;
 import com.carl.http.Request;
 import com.carl.message.ThreadMessage;
+import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
 
 public class LoginThread extends RequestThread {
@@ -41,18 +42,21 @@ public class LoginThread extends RequestThread {
 						false,
 						String.format("<Thread-ID:%d> 账户:%s\t登录成功.",
 								this.getId(), userInfo.getUsername()));
-				updateSatus("已登录.");
+				updateUserInfo(UserMessage.UserStatus.IS_LOGIN,
+						UserMessage.UserProgress.IS_LOGIN);
 			} else {
 				showLogs(true, String.format(
 						"<Thread-ID:%d> 账户:%s\t登录失败,请检查账户信息.", this.getId(),
 						userInfo.getUsername()));
-				updateSatus("未登录.");
+				updateUserInfo(UserMessage.UserStatus.NO_LOGIN,
+						UserMessage.UserProgress.NO_LOGIN);
 			}
 		} catch (IOException e) {
 			if (tryTimes <= ThreadMessage.MAX_TRY_TIME) {
 				showLogs(true, "用户名:" + userInfo.getUsername()
 						+ "\t登录请求发生错误,请检查网络..程序将在2秒后重试...");
-				new LoginThread(controller, userInfo, 2000, tryTimes + 1, code).start();
+				new LoginThread(controller, userInfo, 2000, tryTimes + 1, code)
+						.start();
 			} else {
 				showLogs(true, "用户名:" + userInfo.getUsername()
 						+ "\t登录请求发生错误,请检查网络..程序已重试超过"

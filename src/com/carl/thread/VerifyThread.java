@@ -6,6 +6,7 @@ import com.carl.controller.MainController;
 import com.carl.http.ParseHtml;
 import com.carl.http.Request;
 import com.carl.message.ThreadMessage;
+import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
 
 public class VerifyThread extends RequestThread {
@@ -31,12 +32,12 @@ public class VerifyThread extends RequestThread {
 						false,
 						String.format("<Thread-ID:%d> 账户:%s\t登录状态有效.",
 								this.getId(), userInfo.getUsername()));
-				updateSatus("已登录.");
+				updateUserInfo(UserMessage.UserStatus.IS_LOGIN, UserMessage.UserProgress.IS_LOGIN);
 			} else {
 				showLogs(true, String.format(
 						"<Thread-ID:%d> 账户:%s\t登录状态已失效,需要重新登录.", this.getId(),
 						userInfo.getUsername()));
-				updateSatus("未登录.");
+				updateUserInfo(UserMessage.UserStatus.NO_LOGIN, UserMessage.UserProgress.NO_LOGIN);
 			}
 		} catch (IOException e) {
 			if (this.tryTimes <= ThreadMessage.MAX_TRY_TIME) {

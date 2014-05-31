@@ -13,7 +13,9 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import com.carl.message.LogLevel;
+import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
+import com.carl.thread.InitTaskThread;
 import com.carl.thread.InitThread;
 import com.carl.thread.LoginThread;
 import com.carl.thread.RequestThread;
@@ -164,7 +166,7 @@ public class MainController {
 	 */
 	public void nextAccount() {
 		for (UserInfo u : infos) {
-			if (u.getInprogress() == 0 & "初始化完成".equals(u.getStatus())) {
+			if (u.getInprogress() == UserMessage.UserProgress.NO_LOGIN) {
 				window.setCaptchaAndAccount(u);
 				return;
 			}
@@ -181,6 +183,14 @@ public class MainController {
 		}
 	}
 
+	/*
+	 * 所有账户开始任务
+	 */
+	public void startTask() {
+		for (UserInfo userInfo : infos) {
+			new InitTaskThread(this, userInfo).start();
+		}
+	}
 	/*
 	 * 初始化所有账户数据
 	 */

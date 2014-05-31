@@ -25,6 +25,14 @@ public abstract class RequestThread extends Thread {
 	}
 
 	/*
+	 * 用户状态更新
+	 */
+	protected void updateUserInfo(String status,int inProgress) {
+		userInfo.setStatus(status);
+		userInfo.setInprogress(inProgress);
+		controller.updateTable(userInfo);
+	}
+	/*
 	 * 线程任务
 	 */
 	public abstract void threadTask();
@@ -49,11 +57,6 @@ public abstract class RequestThread extends Thread {
 			e.printStackTrace();
 		}
 		super.start();
-	}
-
-	public void updateSatus(String status) {
-		userInfo.setStatus(status);
-		controller.updateTable(userInfo);
 	}
 
 	public void run() {

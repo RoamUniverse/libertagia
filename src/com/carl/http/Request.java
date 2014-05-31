@@ -23,6 +23,7 @@ public class Request {
 	public static final String captcha = "http://libertagia.com/img/captcha.jpg";
 	public static final String task = "http://libertagia.com/office/tasks";
 	public static final String task_run = "http://tasks.libertagia.com";
+	public static final String task_run_index = "http://tasks.libertagia.com/index.php";
 	public static final String index = "http://libertagia.com/office/dashboard/index";
 	public static void main(String[] args) throws IOException {
 		// UserInfo userInfo = new UserInfo("1114486604@qq.com", "567890");
@@ -52,17 +53,18 @@ public class Request {
 		// Matcher m1 = pattern.matcher(j);
 		// System.out.println(m1.find() ? m1.group(1) : "nothing");
 
-		RE re = new RE(); // 新建正则表达式对象;
-		RECompiler compiler = new RECompiler(); // 新建编译对象;
-		re.setProgram(compiler.compile("\"next_task\":\"[\\d\\w=]+")); // 编译
-		String j ="{\"next_task\":\"M2JhMmFmYjc0ZTFmODBmMDgwM2Q2ZjRjZDRjNWI4ZDN8NmJjNzM3NzhiODY4ODNjYw==\",\"done\":[],\"finished\":false}";
-		boolean bool = re.match(j); // 测试是否匹配;
-		System.out.println(bool);
-		if (bool) {
-			for (int i = 0; i < re.getParenCount(); i++) {
-				System.out.println(re.getParen(i)); // 匹配组;
-			}
-		}
+//		RE re = new RE(); // 新建正则表达式对象;
+//		RECompiler compiler = new RECompiler(); // 新建编译对象;
+//		re.setProgram(compiler.compile("\"next_task\":\"[\\d\\w=]+")); // 编译
+//		String j ="{\"next_task\":\"M2JhMmFmYjc0ZTFmODBmMDgwM2Q2ZjRjZDRjNWI4ZDN8NmJjNzM3NzhiODY4ODNjYw==\",\"done\":[],\"finished\":false}";
+//		boolean bool = re.match(j); // 测试是否匹配;
+//		System.out.println(bool);
+//		if (bool) {
+//			for (int i = 0; i < re.getParenCount(); i++) {
+//				System.out.println(re.getParen(i)); // 匹配组;
+//			}
+//		}
+		System.out.println(new StringBuffer().length());
 
 	}
 
@@ -123,17 +125,25 @@ public class Request {
 	 */
 	private static void updateCookies(UserInfo userInfo, HttpURLConnection conn) {
 		String key = null;
+		RE re = new RE(); // 新建正则表达式对象;
+		RECompiler compiler = new RECompiler(); // 新建编译对象;
+		re.setProgram(compiler.compile("[^\\s]+")); // 编译
 		for (int i = 1; (key = conn.getHeaderFieldKey(i)) != null; i++) {
 			if (key.equalsIgnoreCase("set-cookie")) {
-				String val = conn.getHeaderField(i);
-				val = val.substring(0, val.indexOf(";"));
-				String cKey = val.substring(0, val.indexOf("="));
-				String cVal = val.substring(val.indexOf("=") + 1, val.length());
-				if("deleted".equals(cVal)){
-					userInfo.deleteCookie(cKey);
-				}else {
-					userInfo.addCookie(cKey, cVal);
+				String cookie = conn.getHeaderField(i);
+				boolean bool = re.match(cookie); // 测试是否匹配;
+				if (bool) {
+					cookie = re.getParen(0).replaceAll(";", "");
+					String cKey = cookie.substring(0, cookie.indexOf("="));
+					String cVal = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
+//					System.out.println(cKey + "=" + cVal);
+					if("deleted".equals(cVal)){
+						userInfo.deleteCookie(cKey);
+					}else {
+						userInfo.addCookie(cKey, cVal);
+					}
 				}
+				
 			}
 		}
 	}
@@ -186,9 +196,9 @@ public class Request {
 		}
 
 		// 添加数据
-		OutputStream out = conn.getOutputStream();
 		if (data != null) {
 			conn.setDoOutput(true);
+			OutputStream out = conn.getOutputStream();
 			StringBuffer d = new StringBuffer();
 			Iterator<String> i = data.keySet().iterator();
 			while (i.hasNext()) {
@@ -198,12 +208,16 @@ public class Request {
 				d.append(URLEncoder.encode(key, "utf-8"));
 				d.append("=");
 				d.append(URLEncoder.encode(value, "utf-8"));
+			}
+			if (d.length() == 0) {
 				d.delete(0, 1);
 			}
 			out.write(d.toString().getBytes("utf-8"));
 		}
 		InputStream in = conn.getInputStream();
 		updateCookies(userInfo, conn);
-		return IOUtils.toString(in, "utf-8");
+		String result = IOUtils.toString(in, "utf-8");
+		conn.disconnect();
+		return result;
 	}
 }

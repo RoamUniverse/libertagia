@@ -27,14 +27,16 @@ import javax.swing.table.DefaultTableModel;
 
 import com.carl.controller.MainController;
 import com.carl.pojo.UserInfo;
+import javax.swing.JSplitPane;
+import javax.swing.border.LineBorder;
 
 public class MainWindow extends JFrame {
-
+	private static final long serialVersionUID = 1L;
 	// 内容面板
 	private JPanel contentPane;
 	// 账户表格
 	private JTable table;
-	// 验证码图片
+	// 验证码图片标签
 	private JLabel captcha;
 	// 验证码输入框
 	private JTextField captchaText;
@@ -49,7 +51,7 @@ public class MainWindow extends JFrame {
 	// 用户名标签
 	private JLabel accountLabel;
 	// 初始化按钮
-	private JButton initBtn;
+	private JButton BtnInit;
 	// 反序列化按钮
 	private JButton btnLoadStatus;
 	// 序列化按钮
@@ -62,119 +64,186 @@ public class MainWindow extends JFrame {
 	private UserInfo currentUserInfo;
 	// 输出滚动条
 	private JScrollPane scrollOutput;
+	// 当前账户标签
+	private JLabel currentLabel;
+	// 下个账户按钮
+	private JButton nextBtn;
+	private JPanel panelAccountOperation;
+	private JLabel lblCaptcha;
+	private JPanel panelDataOperation;
+	private JButton btnStartTask;
+	private JButton btnOpenAutoStay;
+	private JLabel lblOperation;
 
-	/**
-	 * Launch the application.
-	 * 
-	 * @throws Exception
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
-	 * @throws ClassNotFoundException
-	 */
-	public static void main(String[] args) throws Exception {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainWindow frame = new MainWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	public MainWindow() {
+		init();
 	}
 
-	/**
-	 * Create the frame.
-	 * 
-	 * @throws Exception
-	 */
-	public MainWindow() {
+	private void init() {
+		setTitle("< Auto - Task > By: Carl.Huang QQ:284642743");
 		setBackground(Color.WHITE);
 		// UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 946, 585);
+		setBounds(100, 100, 946, 499);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		initBtn = new JButton("init");
-		initBtn.setBackground(Color.WHITE);
-		initBtn.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		initBtn.setBounds(773, 24, 117, 36);
-		contentPane.add(initBtn);
+		initAccountsTable();
+		initAccountOperation();
+		initDataOperation();
+		initOutput();
+		initEvents();
+	}
 
+	/*
+	 * 界面构建,账户信息表格
+	 */
+	private void initAccountsTable() {
 		String[] name = { "username", "status" };
 		model = new DefaultTableModel(null, name);
 		table = new JTable(model);
 		table.setFont(new Font("Segoe UI", Font.BOLD, 13));
 		table.setEnabled(false);
 		table.setRowHeight(25);
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(10, 11, 429, 381);
-		contentPane.add(scrollPane);
-		captcha = new JLabel();
-		captcha.setBounds(484, 147, 120, 43);
-		captcha.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		contentPane.add(captcha);
-		captchaText = new JTextField(20);
-		captchaText.setBounds(484, 194, 117, 36);
-		contentPane.add(captchaText);
+		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 10));
+		JScrollPane scrollPaneTable = new JScrollPane(table);
+		scrollPaneTable.setBounds(10, 11, 276, 455);
+		contentPane.add(scrollPaneTable);
+	}
 
-		JLabel currentLabel = new JLabel("Account :");
-		currentLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		currentLabel.setBounds(484, 76, 117, 26);
-		contentPane.add(currentLabel);
+	/*
+	 * 界面构建,信息输出框
+	 */
+	private void initOutput() {
+		// 多行文本框
+		logTextArea = new JTextArea();
+		logTextArea.setTabSize(2);
+		logTextArea.setWrapStyleWord(true);
+		logTextArea.setEditable(false);
+		logTextArea.setLineWrap(true);
+		logTextArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4));
+		logTextArea.setBounds(0, 0, 628, 283);
+		// 滚动面板
+		scrollOutput = new JScrollPane(logTextArea);
+		scrollOutput.setBounds(298, 183, 628, 283);
+		contentPane.add(scrollOutput);
+//		scrollOutput.add(logTextArea);
+	}
 
-		JButton nextBtn = new JButton("Next");
-		nextBtn.setBackground(Color.WHITE);
+	/*
+	 * 界面构建,数据操作组
+	 */
+	private void initDataOperation() {
+		panelDataOperation = new JPanel();
+		panelDataOperation.setBounds(665, 11, 261, 160);
+		panelDataOperation.setBorder(BorderFactory.createLineBorder(
+				Color.BLACK, 3));
+		panelDataOperation.setLayout(null);
+		contentPane.add(panelDataOperation);
 
-		nextBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		nextBtn.setBounds(484, 242, 117, 36);
-		contentPane.add(nextBtn);
-
-		accountLabel = new JLabel("");
-		accountLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		accountLabel.setBounds(484, 110, 117, 26);
-		accountLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		contentPane.add(accountLabel);
+		BtnInit = new JButton("Init");
+		BtnInit.setBackground(Color.WHITE);
+		BtnInit.setFont(new Font("Dialog", Font.BOLD, 13));
+		BtnInit.setBounds(135, 13, 117, 36);
+		panelDataOperation.add(BtnInit);
 
 		btnLoadAccount = new JButton("LoadAccount");
 		btnLoadAccount.setFont(new Font("Dialog", Font.BOLD, 13));
-		btnLoadAccount.setBounds(773, 167, 117, 36);
-		contentPane.add(btnLoadAccount);
-
-		logTextArea = new JTextArea();
-		logTextArea.setLineWrap(true);
-		logTextArea.setBounds(10, 413, 623, 133);
-
-		scrollOutput = new JScrollPane(logTextArea);
-		scrollOutput.setBounds(10, 413, 623, 133);
-		contentPane.add(scrollOutput);
-
-		JLabel lblNewLabel = new JLabel("Output:");
-		lblNewLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		lblNewLabel.setBounds(10, 395, 86, 14);
+		btnLoadAccount.setBounds(9, 13, 117, 36);
+		panelDataOperation.add(btnLoadAccount);
 
 		btnSaveStatus = new JButton("SaveStatus");
 		btnSaveStatus.setFont(new Font("Dialog", Font.BOLD, 13));
 		btnSaveStatus.setBackground(Color.WHITE);
-		btnSaveStatus.setBounds(773, 72, 117, 36);
-		contentPane.add(btnSaveStatus);
+		btnSaveStatus.setBounds(135, 62, 117, 36);
+		panelDataOperation.add(btnSaveStatus);
 
 		btnLoadStatus = new JButton("LoadStatus");
 		btnLoadStatus.setFont(new Font("Segoe UI", Font.BOLD, 13));
-		btnLoadStatus.setBounds(773, 120, 117, 36);
-		contentPane.add(btnLoadStatus);
+		btnLoadStatus.setBounds(9, 62, 117, 36);
+		panelDataOperation.add(btnLoadStatus);
 
+		btnStartTask = new JButton("StartTask");
+		btnStartTask.setFont(new Font("Dialog", Font.BOLD, 13));
+		btnStartTask.setBounds(9, 111, 117, 36);
+		panelDataOperation.add(btnStartTask);
+
+		btnOpenAutoStay = new JButton("OpenAutoStay");
+		btnOpenAutoStay.setFont(new Font("Dialog", Font.BOLD, 13));
+		btnOpenAutoStay.setBounds(135, 111, 117, 36);
+		panelDataOperation.add(btnOpenAutoStay);
+	}
+
+	/*
+	 * 界面构建,账户操作组
+	 */
+	private void initAccountOperation() {
+		panelAccountOperation = new JPanel();
+		panelAccountOperation.setBounds(298, 11, 355, 160);
+		panelAccountOperation.setLayout(null);
+		panelAccountOperation.setBorder(BorderFactory.createLineBorder(
+				Color.BLACK, 3));
+		contentPane.add(panelAccountOperation);
+
+		// 当前账户输出
+		accountLabel = new JLabel("");
+		accountLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		accountLabel.setBounds(85, 15, 249, 43);
+		accountLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		panelAccountOperation.add(accountLabel);
+
+		// 验证码图片
+		captcha = new JLabel();
+		captcha.setBounds(85, 66, 120, 43);
+		captcha.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		panelAccountOperation.add(captcha);
+
+		// 验证码输入框
+		captchaText = new JTextField(20);
+		captchaText.setBounds(217, 66, 120, 43);
+		panelAccountOperation.add(captchaText);
+
+		// 当前账户标签
+		currentLabel = new JLabel("Account :");
+		currentLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		currentLabel.setBounds(6, 26, 68, 26);
+		panelAccountOperation.add(currentLabel);
+
+		// 下个账户按钮
+		nextBtn = new JButton("Next");
+		nextBtn.setBackground(Color.WHITE);
+		nextBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		nextBtn.setBounds(85, 118, 117, 36);
+		panelAccountOperation.add(nextBtn);
+
+		// 验证码标签
+		lblCaptcha = new JLabel("Captcha:");
+		lblCaptcha.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblCaptcha.setBounds(6, 74, 68, 26);
+		panelAccountOperation.add(lblCaptcha);
+
+		// 登录按钮
 		btnLogin = new JButton("Login");
 		btnLogin.setFont(new Font("Dialog", Font.BOLD, 13));
 		btnLogin.setBackground(Color.WHITE);
-		btnLogin.setBounds(613, 242, 117, 36);
-		contentPane.add(btnLogin);
+		btnLogin.setBounds(217, 118, 117, 36);
+		panelAccountOperation.add(btnLogin);
+
+		lblOperation = new JLabel("Operation:");
+		lblOperation.setFont(new Font("Dialog", Font.BOLD, 13));
+		lblOperation.setBounds(6, 122, 85, 26);
+		panelAccountOperation.add(lblOperation);
+
+	}
+
+	/*
+	 * 初始化事件
+	 */
+	private void initEvents() {
 		/*************** 控件事件代码 *****************/
 
 		// loadAccount按钮事件
@@ -212,7 +281,7 @@ public class MainWindow extends JFrame {
 			}
 		});
 		// 初始化按钮事件
-		initBtn.addActionListener(new ActionListener() {
+		BtnInit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.initAllAccount();
 			}
@@ -245,25 +314,14 @@ public class MainWindow extends JFrame {
 				}
 			}
 		});
+		
+		//开始任务
+		btnStartTask.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.startTask();
+			}
+		});
 		/******************************************/
-
-		contentPane.add(lblNewLabel);
-
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("New radio button");
-		rdbtnNewRadioButton.setBounds(475, 333, 109, 23);
-		contentPane.add(rdbtnNewRadioButton);
-
-		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton(
-				"New radio button");
-		rdbtnNewRadioButton_1.setBounds(475, 359, 109, 23);
-		contentPane.add(rdbtnNewRadioButton_1);
-
-		JLabel groupLabel = new JLabel("");
-		groupLabel.setEnabled(false);
-		groupLabel.setBounds(449, 11, 491, 381);
-		groupLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		contentPane.add(groupLabel);
-
 	}
 
 	/*
@@ -280,7 +338,6 @@ public class MainWindow extends JFrame {
 	 * 取得所有账户信息,并显示到表格中 根据表格行数置账户编号属性
 	 */
 	public void showAllAccountInTable(List<UserInfo> infos) {
-		// TODO 置账户编号
 		String[][] data = new String[infos.size()][2];
 		for (int j = 0; j < infos.size(); j++) {
 			UserInfo u = infos.get(j);

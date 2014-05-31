@@ -12,8 +12,8 @@ public class UserInfo implements Serializable {
 	private String password;
 	private transient Image captcha;
 	private Map<String, String> cookies = new HashMap<String, String>();
-	private transient String status = "未登录";
-	private int inprogress = 0;
+	private transient String status = "未登录"; //实时状态信息
+	private int inprogress = 0; //工作流状态
 	private int rowIndex;
 	public void addCookie(String key, String value) {
 		cookies.put(key, value);
