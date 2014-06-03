@@ -96,7 +96,7 @@ public class Request {
 		if (!"".equals(cookies)) {
 			conn.setRequestProperty("Cookie", cookies);
 		}
-		conn.setReadTimeout(15 * 1000);
+		conn.setReadTimeout(30 * 1000);
 		conn.setRequestMethod(method);
 		return conn;
 	}

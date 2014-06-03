@@ -24,9 +24,9 @@ public class GlobalAutoStayThread extends RequestThread {
 			int i = 0;
 			while(i <= 20){
 				try {
-					showInfo("全局任务监视中,距下次监测还有"+(20-i)*5+"秒.....");
+					showInfo("全局任务监视中,距下次监测还有"+(20-i)+"秒.....");
 					i++;
-					Thread.sleep(1000 * 5);
+					Thread.sleep(1000 );
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

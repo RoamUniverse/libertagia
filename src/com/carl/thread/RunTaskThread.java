@@ -78,7 +78,7 @@ public class RunTaskThread extends RequestThread {
 			data.put("action", "finishTask");
 			result = Request.postURLResult(userInfo, Request.task_run_index, data, null, false);
 			
-			if(!(ParseHtml.verifyLoginStatus(result, "true") & ParseHtml.verifyLoginStatus(result, "false"))){
+			if(ParseHtml.verifyLoginStatus(result, "true") && ParseHtml.verifyLoginStatus(result, "false")){
 				showError("ÈÎÎñÊ§°Ü...¶ªÊ§µÇÂ¼×´Ì¬...");
 				//ÈÎÎñÊ§°Ü,ÖÃ×´Ì¬Î´µÇÂ¼
 				updateUserInfo(UserMessage.UserStatus.FAIL_TASK,
@@ -87,6 +87,10 @@ public class RunTaskThread extends RequestThread {
 			}
 			new RunTaskThread(controller, userInfo).start();
 		} catch (IOException e) {
+			showError("ÈÎÎñ³¬Ê±Ê§°Ü...¶ªÊ§µÇÂ¼×´Ì¬...");
+			//ÈÎÎñÊ§°Ü,ÖÃ×´Ì¬Î´µÇÂ¼
+			updateUserInfo(UserMessage.UserStatus.FAIL_TASK,
+					UserMessage.UserProgress.NO_LOGIN);
 			e.printStackTrace();
 		}
 		
