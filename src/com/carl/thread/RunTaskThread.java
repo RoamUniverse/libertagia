@@ -87,7 +87,7 @@ public class RunTaskThread extends RequestThread {
 			}
 			new RunTaskThread(controller, userInfo).start();
 		} catch (IOException e) {
-			showError("任务超时失败...丢失登录状态...");
+			showError("任务请求发生错误,请检查网络状态...");
 			//任务失败,置状态未登录
 			updateUserInfo(UserMessage.UserStatus.FAIL_TASK,
 					UserMessage.UserProgress.NO_LOGIN);

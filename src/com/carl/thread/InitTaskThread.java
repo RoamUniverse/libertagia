@@ -7,7 +7,6 @@ import java.util.Map;
 import com.carl.controller.MainController;
 import com.carl.http.ParseHtml;
 import com.carl.http.Request;
-import com.carl.message.ThreadMessage;
 import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
 
@@ -89,13 +88,14 @@ public class InitTaskThread extends RequestThread {
 			e.printStackTrace();
 			updateUserInfo(UserMessage.UserStatus.FAIL_TASK,
 					UserMessage.UserProgress.IS_LOGIN);
-			if (tryTimes <= ThreadMessage.MAX_TRY_TIME) {
-				showError("初始化任务发生错误,请检查网络..程序将在2秒后重试...");
-				new InitTaskThread(controller, userInfo, 2000, tryTimes + 1).start();
-			} else {
-				showError("初始化任务发生错误,请检查网络..程序已重试超过"
-						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
-			}
+			showError("初始化任务发生错误,请检查网络....");
+//			if (tryTimes <= ThreadMessage.MAX_TRY_TIME) {
+//				showError("初始化任务发生错误,请检查网络..程序将在2秒后重试...");
+//				new InitTaskThread(controller, userInfo, 2000, tryTimes + 1).start();
+//			} else {
+//				showError("初始化任务发生错误,请检查网络..程序已重试超过"
+//						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
+//			}
 		}
 	}
 }

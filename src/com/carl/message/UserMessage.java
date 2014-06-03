@@ -33,7 +33,8 @@ public class UserMessage {
 		public static final String IS_LOGIN = "已登录";
 		public static final String FAIL_LOGIN = "登录失败";
 		public static final String IN_INIT = "初始化中";
-		public static final String DONE_INIT = "初始化完成";
+//		public static final String DONE_INIT = "初始化完成";
+		public static final String DONE_INIT = "等待登陆";
 		public static final String FAIL_INIT = "初始化失败";
 		public static final String IN_VERIFY = "验证中";
 		public static final String FAIL_VARIFY = "验证失败";

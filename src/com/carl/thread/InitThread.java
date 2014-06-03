@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.carl.controller.MainController;
 import com.carl.http.ParseHtml;
 import com.carl.http.Request;
-import com.carl.message.ThreadMessage;
 import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
 
@@ -30,12 +29,12 @@ public class InitThread extends RequestThread {
 			if (ParseHtml.verifyLoginStatus(result, "Welcome")) {
 				// 判断已登录,置状态已登录.
 				updateUserInfo(UserMessage.UserStatus.IS_LOGIN, UserMessage.UserProgress.IS_LOGIN);
-				showInfo("已登录.....开始自动任务....");
-				new InitTaskThread(controller, userInfo).start();
+				showInfo("已登录......");
+				//new InitTaskThread(controller, userInfo).start();
 				return;
 			}
-			showInfo("未登录....");
-			showInfo("正在初始化....当前尝试次数:" + tryTimes + "....");
+			//showInfo("未登录....");
+			showInfo("正在初始化....");
 			Request.getInitCookiesAndCaptcha(userInfo);
 			if (userInfo.getCaptcha()!=null) {
 				//初始化完成,置状态初始化完成.
@@ -45,17 +44,18 @@ public class InitThread extends RequestThread {
 			}
 			//初始化失败,置状态未登录
 			updateUserInfo(UserMessage.UserStatus.FAIL_INIT, UserMessage.UserProgress.NO_LOGIN);				
-			showInfo("初始化失败.....");
+			showInfo("初始化状态发生错误,请检查网络....");
 		} catch (IOException e) {
 			//初始化异常,置状态未登录.
 			updateUserInfo(UserMessage.UserStatus.FAIL_INIT, UserMessage.UserProgress.NO_LOGIN);
-			if (this.tryTimes <= ThreadMessage.MAX_TRY_TIME) {
-				showError("初始化状态发生错误,请检查网络..程序将在2秒后重试...");
-				new InitThread(controller, userInfo, 2000, tryTimes + 1).start();
-			} else {
-				showError("初始化状态发生错误,请检查网络..程序已重试超过"
-						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
-			}
+			showError("初始化状态发生错误,请检查网络....");
+//			if (this.tryTimes <= ThreadMessage.MAX_TRY_TIME) {
+//				showError("初始化状态发生错误,请检查网络..程序将在2秒后重试...");
+//				//new InitThread(controller, userInfo, 2000, tryTimes + 1).start();
+//			} else {
+//				showError("初始化状态发生错误,请检查网络..程序已重试超过"
+//						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
+//			}
 		}
 	}
 

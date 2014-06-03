@@ -11,6 +11,9 @@ public abstract class RequestThread extends Thread {
 	// 重试次数
 	protected int tryTimes = 1;
 
+	// 系统换行符
+	private String lineSeparator = System.getProperty("line.separator", "\n");
+	
 	public RequestThread(MainController controller, UserInfo userInfo,
 			int delay, int tryTimes) {
 		super();
@@ -41,11 +44,12 @@ public abstract class RequestThread extends Thread {
 	 * 输出日志
 	 */
 	private void showLogs(boolean isError, String msg) {
-		if(userInfo!=null){
-			msg = String.format("<Thread-ID:%d>\t账户:%s\t%s", this.getId(),
-					userInfo.getUsername(),msg);
-		}else {
-			msg = String.format("<Thread-ID:%d>\t%s", this.getId(),msg);
+		if (userInfo != null) {
+			// msg = String.format("<Thread-ID:%d>\t账户:%s\t%s", this.getId(),
+			// userInfo.getUsername(),msg);
+			msg = String.format("账户:%s"+lineSeparator+"\t\t%s", userInfo.getUsername(), msg);
+		} else {
+			msg = String.format("%s", msg);
 		}
 		if (isError) {
 			controller.showErrorLogs(msg);

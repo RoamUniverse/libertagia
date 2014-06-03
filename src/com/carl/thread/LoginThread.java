@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.carl.controller.MainController;
 import com.carl.http.ParseHtml;
 import com.carl.http.Request;
-import com.carl.message.ThreadMessage;
 import com.carl.message.UserMessage;
 import com.carl.pojo.UserInfo;
 
@@ -32,19 +31,19 @@ public class LoginThread extends RequestThread {
 		try {
 			//置正在登录状态
 			updateUserInfo(UserMessage.UserStatus.IN_LOGIN, UserMessage.UserProgress.IN_LOGIN);
-			showInfo("正在登录...当前尝试次数:"+tryTimes+"....");
+			showInfo("正在登录.....");
 			Request.getLoginCookies(userInfo, code);
 			String result = Request.getURLResult(userInfo, Request.index);
 			if (ParseHtml.verifyLoginStatus(result)) {
 				//登录成功,置状态已登录
 				updateUserInfo(UserMessage.UserStatus.IS_LOGIN,
 						UserMessage.UserProgress.IS_LOGIN);
-				showInfo("登录成功.....开始自动任务....");
-				new InitTaskThread(controller, userInfo).start();
+				showInfo("登录成功........");
+				//new InitTaskThread(controller, userInfo).start();
 			} else {
 				showError("登录失败...请检查账户信息...");
 				//登录失败,置状态未登录
-				updateUserInfo(UserMessage.UserStatus.NO_LOGIN,
+				updateUserInfo(UserMessage.UserStatus.FAIL_LOGIN,
 						UserMessage.UserProgress.NO_LOGIN);
 				return;
 			}
@@ -52,14 +51,15 @@ public class LoginThread extends RequestThread {
 			//登录异常,置状态未登录
 			updateUserInfo(UserMessage.UserStatus.FAIL_LOGIN,
 					UserMessage.UserProgress.NO_LOGIN);
-			if (tryTimes <= ThreadMessage.MAX_TRY_TIME) {
-				showError("登录请求发生错误,请检查网络..程序将在2秒后重试...");
-				new LoginThread(controller, userInfo, 2000, tryTimes + 1, code)
-						.start();
-			} else {
-				showError("登录请求发生错误,请检查网络..程序已重试超过"
-						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
-			}
+			showError("登录请求发生错误,请检查网络....");
+//			if (tryTimes <= ThreadMessage.MAX_TRY_TIME) {
+//				showError("登录请求发生错误,请检查网络..程序将在2秒后重试...");
+//				new LoginThread(controller, userInfo, 2000, tryTimes + 1, code)
+//						.start();
+//			} else {
+//				showError("登录请求发生错误,请检查网络..程序已重试超过"
+//						+ ThreadMessage.MAX_TRY_TIME + "次,将停止本次操作....");
+//			}
 
 			e.printStackTrace();
 		}

@@ -54,6 +54,9 @@ public class MainController {
 			this.showInfoLogs("文件已确认,正在读取数据....");
 			List<String> context = FileUtils.readLines(accountFile);
 			this.parseAccountFile(context);
+			window.setBtnLoadStatus(false);
+			window.setBtnVerifyStatus(false);
+			window.setBtnImportAccountAble(false);
 		} catch (IOException e) {
 			this.showMessage("程序发生内部错误,请联系作者!!!");
 			e.printStackTrace();
@@ -85,7 +88,7 @@ public class MainController {
 			this.showInfoLogs(String.format("解析结果: 总数 %d , 成功 %d , 失败 %d",
 					count, success, fail));
 		}
-		initAllAccount();
+		//initAllAccount();
 	}
 
 	/*
@@ -100,9 +103,15 @@ public class MainController {
 			ois = new ObjectInputStream(new FileInputStream(load));
 			infos = (List<UserInfo>) ois.readObject();
 			ois.close();
+			if(infos == null){
+				infos = new ArrayList<UserInfo>();
+			}
 			this.updateTable();
-			showInfoLogs("状态文件读取完毕,开始校验登录状态....");
-			initAllAccount();
+			window.setBtnImportAccountAble(false);
+			window.setBtnInitLogin(false);
+			window.setBtnLoadStatus(false);
+			//window.setBtnVerifyStatus(false);
+			showInfoLogs("状态文件读取完毕....");
 		} catch (FileNotFoundException e) {
 			showMessage("文件不存在或不可读,请重试.");
 			e.printStackTrace();
@@ -176,8 +185,8 @@ public class MainController {
 		}
 		//无账户则禁用
 		window.setLoginBtnAble(false);
-		this.showInfoLogs("无账户需要登录..已启动初始化账户线程...");
-		initAllAccount();
+		this.showMessage("无账户需要登录.......");
+		//initAllAccount();
 	}
 	
 	/*
@@ -202,9 +211,14 @@ public class MainController {
 		thread.start();
 	}
 	public void shutdownGlobalThread() {
-		while(thread.isAlive()){
+//		while(thread.isAlive()){
 			thread.setStopRequest(false);
-		}
+			window.lblNextCheck.setText("未启动");
+//		}
+	}
+	
+	public void updateNextCheck(int i) {
+		window.lblNextCheck.setText(i+"秒");
 	}
 	/*
 	 * 所有账户开始任务

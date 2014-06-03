@@ -22,9 +22,12 @@ public class GlobalAutoStayThread extends RequestThread {
 		showInfo("全局任务监视线程已启动.....");
 		while (stopRequest) {
 			int i = 0;
-			while(i <= 20){
+			while(i <= 60){
+				if(!stopRequest){
+					break;
+				}
 				try {
-					showInfo("全局任务监视中,距下次监测还有"+(20-i)+"秒.....");
+					controller.updateNextCheck(60-i);
 					i++;
 					Thread.sleep(1000 );
 				} catch (InterruptedException e) {
