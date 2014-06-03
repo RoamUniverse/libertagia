@@ -99,7 +99,7 @@ public class MainWindow extends JFrame {
 		// UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 438, 374);
+		setBounds(100, 100, 442, 374);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -198,7 +198,7 @@ public class MainWindow extends JFrame {
 	 */
 	private void initDataOperation() {
 		panelDataOperation = new JPanel();
-		panelDataOperation.setBounds(332, 11, 99, 117);
+		panelDataOperation.setBounds(332, 96, 99, 117);
 		panelDataOperation.setBorder(BorderFactory.createLineBorder(
 				Color.BLACK, 1));
 		panelDataOperation.setLayout(null);
@@ -231,7 +231,7 @@ public class MainWindow extends JFrame {
 		panelAccount = new JPanel();
 		panelAccount.setLayout(null);
 		panelAccount.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-		panelAccount.setBounds(332, 133, 99, 82);
+		panelAccount.setBounds(332, 11, 99, 82);
 		contentPane.add(panelAccount);
 
 		// 载入账户文件按钮
