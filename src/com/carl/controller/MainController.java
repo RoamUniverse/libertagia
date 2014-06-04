@@ -184,7 +184,7 @@ public class MainController {
 			}
 		}
 		//无账户则禁用
-		window.setLoginBtnAble(false);
+		//window.setLoginBtnAble(false);
 		this.showMessage("无账户需要登录.......");
 		//initAllAccount();
 	}
@@ -278,6 +278,17 @@ public class MainController {
 		window.showAllAccountInTable(infos);
 	}
 
+	/*
+	 * 查看是否有此状态用户
+	 */
+	public boolean isStatusExist(int progress) {
+		for (UserInfo u : infos) {
+			if (u.getInprogress() == progress) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public List<UserInfo> getInfos() {
 		return infos;
 	}

@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 
@@ -20,13 +22,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.carl.controller.MainController;
 import com.carl.pojo.UserInfo;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -96,7 +98,17 @@ public class MainWindow extends JFrame {
 	private void init() {
 		setTitle("< Auto - Task > By: Carl.Huang");
 		setBackground(Color.WHITE);
-		// UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 442, 374);
@@ -121,10 +133,10 @@ public class MainWindow extends JFrame {
 		String[] name = { "用户名", "状态信息" };
 		model = new DefaultTableModel(null, name);
 		table = new JTable(model);
-		table.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		table.setFont(new Font("Segoe UI,楷体", Font.BOLD, 13));
 		table.setEnabled(false);
 		table.setRowHeight(25);
-		table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 10));
+		table.getTableHeader().setFont(new Font("Segoe UI,楷体", Font.BOLD, 10));
 		JScrollPane scrollPaneTable = new JScrollPane(table);
 		scrollPaneTable.setBounds(10, 11, 310, 160);
 		contentPane.add(scrollPaneTable);
@@ -214,7 +226,7 @@ public class MainWindow extends JFrame {
 
 		// 载入状态按钮
 		btnLoadStatus = new JButton("\u8F7D\u5165\u72B6\u6001");
-		btnLoadStatus.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		btnLoadStatus.setFont(new Font("Segoe UI,楷体", Font.BOLD, 13));
 		btnLoadStatus.setForeground(Color.BLUE);
 		btnLoadStatus.setBounds(6, 6, 90, 36);
 		panelDataOperation.add(btnLoadStatus);
@@ -262,7 +274,7 @@ public class MainWindow extends JFrame {
 
 		// 当前账户输出
 		accountLabel = new JLabel("");
-		accountLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		accountLabel.setFont(new Font("Segoe UI,楷体", Font.BOLD, 13));
 		accountLabel.setBounds(53, 9, 249, 43);
 		accountLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		panelAccountOperation.add(accountLabel);
@@ -280,17 +292,16 @@ public class MainWindow extends JFrame {
 		panelAccountOperation.add(captchaText);
 
 		// 当前账户标签
-		currentLabel = new JLabel("\u8D26\u6237 :");
-		currentLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		currentLabel = new JLabel("账户 :");
+		currentLabel.setFont(new Font("Segoe UI,楷体", Font.BOLD, 13));
 		currentLabel.setBounds(6, 26, 68, 26);
 		panelAccountOperation.add(currentLabel);
 
 		// 下个账户按钮
 		nextBtn = new JButton("\u4E0B\u4E00\u4E2A");
-		nextBtn.setEnabled(false);
 		nextBtn.setForeground(Color.BLACK);
 		nextBtn.setBackground(Color.WHITE);
-		nextBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		nextBtn.setFont(new Font("Segoe UI,楷体", Font.BOLD, 13));
 		nextBtn.setBounds(53, 112, 117, 36);
 		panelAccountOperation.add(nextBtn);
 
@@ -303,7 +314,6 @@ public class MainWindow extends JFrame {
 		// 登录按钮
 		btnLogin = new JButton("\u767B\u9646");
 		btnLogin.setForeground(Color.BLACK);
-		btnLogin.setEnabled(false);
 		btnLogin.setFont(new Font("Dialog", Font.BOLD, 13));
 		btnLogin.setBackground(Color.BLACK);
 		btnLogin.setBounds(185, 112, 117, 36);
@@ -349,17 +359,16 @@ public class MainWindow extends JFrame {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String code = captchaText.getText();
-				if (!"".equals(code)) {
+				if (!"".equals(code) || currentUserInfo ==null) {
 					controller.Login(currentUserInfo, code);
+					currentUserInfo = null;
 					captchaText.setText("");
-					captchaText.setEditable(false);
+					//captchaText.setEditable(false);
 					captcha.setIcon(null);
 					accountLabel.setText("");
-					// nextBtn.doClick();
-					setLoginBtnAble(false);
 					return;
 				}
-				showMessage("验证码为空,请重试.");
+				//showMessage("验证码为空,请重试.");
 			}
 		});
 
@@ -448,7 +457,6 @@ public class MainWindow extends JFrame {
 		accountLabel.setText(userInfo.getUsername());
 		captcha.setIcon(new ImageIcon(userInfo.getCaptcha()));
 		captcha.repaint();
-		setLoginBtnAble(true);
 		captchaText.setEnabled(true);
 	}
 
@@ -551,14 +559,6 @@ public class MainWindow extends JFrame {
 		lblThreadCount.setText("" + count);
 	}
 
-	/*
-	 * 禁用登录按钮
-	 */
-	public void setLoginBtnAble(boolean b) {
-		btnLogin.setEnabled(b);
-		captchaText.setEnabled(b);
-
-	}
 	/*
 	 * 设置载入账户按钮
 	 */

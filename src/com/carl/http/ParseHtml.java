@@ -2,8 +2,6 @@ package com.carl.http;
 
 import org.apache.regexp.RE;
 import org.apache.regexp.RECompiler;
-import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.TagNode;
 
 public class ParseHtml {
 	/*
@@ -13,12 +11,6 @@ public class ParseHtml {
 	 * Ä¿±ê:<input type="hidden" value="5386c7b1aa2a948b1492c545" name="secret">
 	 */
 	public static String getSecretParam(String result) {
-		HtmlCleaner c = new HtmlCleaner();
-		TagNode root =c.clean(result);
-		TagNode[] t = root.getElementsByAttValue("name", "secret", true, false);
-		for (TagNode tagNode : t) {
-			return tagNode.getAttributeByName("value");
-		}
 		return null;
 	}
 	
