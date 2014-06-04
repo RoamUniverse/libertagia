@@ -367,6 +367,7 @@ public class MainWindow extends JFrame {
 					//captchaText.setEditable(false);
 					captcha.setIcon(null);
 					accountLabel.setText("");
+					nextBtn.doClick();
 					return;
 				}
 				//showMessage("验证码为空,请重试.");

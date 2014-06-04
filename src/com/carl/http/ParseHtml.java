@@ -1,7 +1,14 @@
 package com.carl.http;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.regexp.RE;
 import org.apache.regexp.RECompiler;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.TagNode;
+import org.htmlcleaner.XPatherException;
 
 public class ParseHtml {
 	/*
@@ -11,7 +18,18 @@ public class ParseHtml {
 	 * 目标:<input type="hidden" value="5386c7b1aa2a948b1492c545" name="secret">
 	 */
 	public static String getSecretParam(String result) {
-		return null;
+		 HtmlCleaner cleaner = new HtmlCleaner();  
+		 TagNode node = cleaner.clean(result);
+		 String secret = null;
+		 try {
+			 Object[] ns = node.evaluateXPath("//input[@type='hidden']");
+			 if(ns.length > 0){
+				 secret = ((TagNode)ns[0]).getAttributeByName("value");
+			 }
+		} catch (XPatherException e) {
+			e.printStackTrace();
+		}
+		return secret;
 	}
 	
 	/*
@@ -92,7 +110,25 @@ public class ParseHtml {
 	 * HTML判断任务是否完成
 	 */
 	public static boolean isCompletedTask(String result) {
-		return result.contains("Your daily tasks have been completed successfully");
+		if(result.contains("Your daily tasks have been completed successfully"))
+			return true;
+		DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+		String today = f.format(new Date());
+		HtmlCleaner cleaner = new HtmlCleaner();  
+		 TagNode node = cleaner.clean(result);
+		 try {
+			 Object[] td = node.evaluateXPath("//table//tbody//tr//td[1]");
+			 if(td.length == 0)
+				 return false;
+			 for (Object o : td) {
+				String date = ((TagNode)o).getText().toString();
+				if(today.equals(date))
+					return true;
+			}
+		} catch (XPatherException e) {
+			e.printStackTrace();
+		}
+		 return false;
 	}
 	/*
 	 * 验证登录状态是否有效
