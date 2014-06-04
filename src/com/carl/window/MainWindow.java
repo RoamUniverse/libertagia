@@ -360,7 +360,7 @@ public class MainWindow extends JFrame {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String code = captchaText.getText();
-				if (!"".equals(code) || currentUserInfo ==null) {
+				if (!"".equals(code) || currentUserInfo !=null) {
 					controller.Login(currentUserInfo, code);
 					currentUserInfo = null;
 					captchaText.setText("");

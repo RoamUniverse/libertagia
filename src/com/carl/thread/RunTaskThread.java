@@ -54,7 +54,8 @@ public class RunTaskThread extends RequestThread {
 			int taskNO = ParseHtml.getDoneTaskCount(result);
 			String token = ParseHtml.getNextTask(result);
 			showInfo("当前执行第" + taskNO + "个任务..");
-			
+			updateUserInfo(("当前执行第" + taskNO + "个任务.."),
+					UserMessage.UserProgress.IN_TASK);
 			
 			// 2.POST http://tasks.libertagia.com/ 参数:action=view code=下一个任务token
 			// 结果:取得任务进行页面 captcha

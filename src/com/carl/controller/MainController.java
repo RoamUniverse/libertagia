@@ -184,7 +184,7 @@ public class MainController {
 		}
 		//无账户则禁用
 		//window.setLoginBtnAble(false);
-		this.showMessage("无账户需要登录.......");
+		//this.showMessage("无账户需要登录.......");
 		//initAllAccount();
 	}
 	
