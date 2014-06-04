@@ -35,6 +35,7 @@ public class GlobalAutoStayThread extends RequestThread {
 				}
 			}
 			controller.startTask();
+			controller.saveSerializableFile(controller.getRunPath()+"/status.dex");
 			showInfo("全局任务正在进行定时监测.....");
 		}
 		showInfo("全局任务监视线程已结束.....");

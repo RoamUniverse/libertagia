@@ -13,6 +13,7 @@ public class Begin {
 					MainController controller = new MainController();
 					MainWindow window = new MainWindow();
 					controller.setWindow(window);
+					controller.setRunPath(System.getProperty("user.dir"));
 					window.setController(controller);
 					window.setVisible(true);
 				} catch (Exception e) {

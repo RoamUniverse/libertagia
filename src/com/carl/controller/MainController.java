@@ -39,7 +39,8 @@ public class MainController {
 	private int threadCount = 0;
 	//全局任务线程
 	private GlobalAutoStayThread thread;
-	
+	//当前路径
+	private String runPath;
 	/*
 	 * 从文件读入账户信息 用于初始化账户信息
 	 */
@@ -62,7 +63,6 @@ public class MainController {
 			e.printStackTrace();
 		}
 	}
-
 	/*
 	 * 解析账户文件
 	 */
@@ -163,7 +163,6 @@ public class MainController {
 		}
 		infos = null;
 	}
-
 	/*
 	 * 收到用户输入的验证码
 	 */
@@ -299,5 +298,13 @@ public class MainController {
 
 	public void setWindow(MainWindow window) {
 		this.window = window;
+	}
+
+	public String getRunPath() {
+		return runPath;
+	}
+
+	public void setRunPath(String runPath) {
+		this.runPath = runPath;
 	}
 }

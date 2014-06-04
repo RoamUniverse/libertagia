@@ -73,11 +73,11 @@ public class ParseHtml {
 			System.out.println(tmp);
 			tmp = tmp.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
 			if ("".equals(tmp)) {
-				return 0;
+				return 1;
 			}
 			String[] a = tmp.split(",");
 			System.out.println(a.length);
-			return a.length;
+			return a.length+1;
 		}
 		return 0;
 	}
@@ -105,23 +105,5 @@ public class ParseHtml {
 	 */
 	public static boolean verifyLoginStatus(String result) {
 		return result.contains("Welcome");
-	}
-	public static void main(String[] args) {
-		String s = "[\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8ZDNkeEdldEI4RG1ZMWQ5Qw==\",\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8V09Pc3JnTnNUTEdVZlQ3VA==\",\"ZWFmZDJkYmM5YTY3ZDQ0OGM1MWNhZWNkOGZmYTNiM2Z8ZmE1YjA1ZWJhMjRlOTk0Mg==\"]";
-		RE re = new RE(); // 新建正则表达式对象;
-		RECompiler compiler = new RECompiler(); // 新建编译对象;
-		re.setProgram(compiler.compile("\\[.+,*\\]")); // 编译
-		boolean bool = re.match(s); // 测试是否匹配;
-		System.out.println(bool);
-		if (bool) {
-			String tmp = re.getParen(0);
-			System.out.println(tmp);
-			tmp = tmp.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "");
-			String[] a = tmp.split(",");
-			System.out.println(a.length);
-			for (String string : a) {
-				System.out.println(string);
-			}
-		}
 	}
 }

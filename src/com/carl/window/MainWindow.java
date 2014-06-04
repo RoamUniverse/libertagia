@@ -332,6 +332,7 @@ public class MainWindow extends JFrame {
 	 */
 	private void initEvents() {
 		/*************** 控件事件代码 *****************/
+		
 		// 状态验证
 		btnVerifyStatus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -376,6 +377,7 @@ public class MainWindow extends JFrame {
 		btnSaveStatus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser(); // 对话框
+				fileChooser.setCurrentDirectory(new File(controller.getRunPath()));
 				int i = fileChooser.showSaveDialog(getContentPane()); // opendialog
 				if (i == JFileChooser.APPROVE_OPTION) // 判断是否为打开的按钮
 				{
@@ -390,6 +392,7 @@ public class MainWindow extends JFrame {
 		btnLoadStatus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser(); // 对话框
+				fileChooser.setCurrentDirectory(new File(controller.getRunPath()));
 				int i = fileChooser.showOpenDialog(getContentPane());
 				if (i == JFileChooser.APPROVE_OPTION) // 判断是否为打开的按钮
 				{
@@ -404,6 +407,7 @@ public class MainWindow extends JFrame {
 		btnImportAccount.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser(); // 对话框
+				fileChooser.setCurrentDirectory(new File(controller.getRunPath()));
 				int i = fileChooser.showOpenDialog(getContentPane()); // opendialog
 				if (i == JFileChooser.APPROVE_OPTION) // 判断是否为打开的按钮
 				{
